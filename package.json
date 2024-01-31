@@ -1,0 +1,15 @@
+{
+  "name": "myjsunit",
+  "version": "1.0.0",
+  "description": "minimalistic testing framework for Node.js based on phpunit",
+  "main": "testSuite.js",
+  "type": "module",
+  "scripts": {
+    "test": "node myrunner.js"
+  },
+  "keywords": ["testing", "framework", "Node.js"],
+  "author": "Rudy Martin Baumler",
+  "license": "MIT",
+  "dependencies": {
+  }
+}

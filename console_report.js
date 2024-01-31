@@ -44,25 +44,19 @@ class counters {
     }
 
 }
-export class console_report {
+
+class console_report {
     constructor( output ) {
         if( output  === undefined ){
             output = new console_output();
         }
+        
         this.output = output;
-        
         this.timers = [];
-        
-        
-        this.counters = new counters();
-        
-        
-
         this.error_list = [];
-                        
+        this.counters = new counters();
         this.main_timer = new myclock();
         this.main_timer.start();
-
         
     }
     
@@ -78,14 +72,17 @@ export class console_report {
     }
 
     header(){
-        console.log( "JAESTF - by @RudyMartin " );
-        console.log( "ES6 JavaScript Testing Framework vaguely inspired on PHPUnit" );
+        console.log( "MinTF - by @RudyMartin " );
+        console.log( "Minimalistic Testing Framework -- vaguely inspired on PHPUnit" );
         console.log( "Licence: WTFPL - https://en.wikipedia.org/wiki/WTFPL");
         console.log( "");
     }
 
     ok(){
         this.counters.inc_ok();
+    }
+    has_failed(){
+        return this.counters.failed > 0;
     }
     failed(){
         this.counters.inc_failed();
@@ -98,8 +95,7 @@ export class console_report {
 
     risky(){
         this.counters.inc_risky();
-        // R "dot"
-        this.output.risky( "R" );
+        this.output.risky( "R" ); // R "dot"
     }
 
     add_error( element ){
@@ -115,12 +111,10 @@ export class console_report {
         this.error_list.forEach( function( mensaje ) {
             if( mensaje instanceof Error   ){
                 self.output.normal( mensaje.stack );
-                self.output.line_break();
-                self.output.line_break();
             } else {
                 self.output.normal( mensaje );
-                self.output.line_break();
             }
+            self.output.line_break();
 
         });
         
@@ -153,8 +147,12 @@ export class console_report {
         var which_method = "";
         this.timers.forEach( function( item ){
             var timer = item[2];
+            if( timer === undefined ){ // failed test ?
+                return ;
+            }
+            
             var spent = timer.diff();
-            if( spent > max ){
+            if( parseFloat( spent ) > parseFloat( max ) ){
                 which_class = item[0];
                 which_method = item[1];
                 max = spent;
@@ -162,8 +160,12 @@ export class console_report {
         });
         this.output.line_break();
         this.output.text_normal( "Total = "+this.main_timer.diff()+" msecs / Test Average = "+average.toFixed(3)+" msecs" );
+        
+        this.output.line_break();
+        
         if( max > average ){
             this.output.text_normal( "Slowest test: "+which_class+"."+which_method+" = "+max+" msecs"  );	    
+            this.output.line_break();
         }
     }
     
@@ -178,6 +180,8 @@ export class console_report {
         this.output.line_break();
         if( failed > 0 || risky > 0 ){
             this.list_errors();
+            // bash scripts could need this
+            process.exitCode = 1; 
         }
 
         this.print_total_asserts();
@@ -186,3 +190,5 @@ export class console_report {
     }
     
 }
+
+export {console_report}

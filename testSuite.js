@@ -1,150 +1,184 @@
-import { myclock } from "./myclock.js";
-import { console_report } from "./console_report.js";
-
-/* helper function to get methods names starting with "test" 
- * from an object
+/* 
  */
-const getMethods = function (obj)  {
-    let properties = new Set();
-    let currentObj = obj;
-    do { Object.getOwnPropertyNames( currentObj ).map( function( item ) { properties.add(item); } ); } 
-    while ( (currentObj = Object.getPrototypeOf( currentObj ) )  )
-    return [...properties.keys()].filter( 
-        function ( item ) {
-            return typeof obj[item] === 'function' && item.substring(0, 4) === "test";
-        } 
-    );
-};
 
 
-export class TestSuite {
+import { console_report } from "./console_report.js";
+import { myclock } from "./myclock.js";
+import { Test, TestBad, TestRunner } from "./Test.js";
 
-    constructor( report ){
-        if( report === undefined ){
-            throw "Report object was not defined !!!";
-        }
-        this.tests = [];
-        this.stopError = false;
-        this.report = report;
-    }
 
-    addTest( testName ){
-        this.tests.push( testName );
-    }
+class TestSuite {
+    tests = [ ];
+    report = null;
 
-    run(){
-        
-        this.config();
-        var report = this.report;
-
+    constructor(){
+        var report = new console_report();
         report.header();
 
-        /*
-         * for earch test object
-         * get the list of methods whose name start with "test"
-         * and run it.
-         */
-        var self = this;
+        this.report = report;
 
-        /* TODO: should I create one object per method invocation ??
-         */
-        this.tests.forEach( function( testClass ){
-            var methods;
-            var class_name = testClass.constructor.name;
+    }
 
-            // stop on error?
-            if( self.stopError && report.failed > 0 ){
-                return ;
+    mostrar_tiempos = false;
+    mayor_1 = true;
+
+    // dump slow tests
+    dump_test_time( clase, metodo, tiempo ){
+        if( !this.mostrar_tiempos ) {
+            return;
+        }
+        if( this.mayor_1 && tiempo < 1 )
+            return;
+
+        // parche para imprimir los tiempos de cada test
+        console.log( clase + ":" + metodo + "() ", tiempo )
+    }
+
+    addTest( test ){
+        this.tests.push( test );
+    }
+
+    is_all_done(  ){
+        let control = true;
+        this.runners.forEach( function ( test ){
+            if( !test.is_all_done() ) {
+                control = false;
             }
-
-            methods = getMethods( testClass );
-            
-            methods.forEach( function( method ){
-                // stop on error?
-                if( self.stopError && report.failed > 0 ){
-                    return ;
-                }
-                report.total();
-                testClass.numberofAsserts = 0;
-                testClass.anyAssert = false;
-
-                /* I hate having to use try/catch
-                 * but we have no option here 
-                 * since we want to keep running all test methods
-                 * and then print the report of what happened 
-                 */
-                try {
-                    testClass.runTest( method );
-                    report.ok();
-                    if( testClass.anyAssert ){
-                        report.dot();
-                    } else {
-                        report.add_error(  class_name+":"+method+" "+": OK but no assertions were made!\n" );
-                        report.risky();
-                    }
-                } catch ( e ){
-                    report.failed();
-                    report.add_error(  class_name+":"+method+" "+": "  );
-                    report.add_error(  e );
-//                    report.add_error( "" );
-                }
-                report.add_timer( class_name, method, testClass.timer );
-
-                report.assertsRun( testClass.numberofAsserts );
-            });
         } );
-        if( self.stopError && report.failed > 0 ){
-            report.add_error(  "Test suite stopped on first error per testsuite.config()"  );
+        return control;
+    }
+
+    #print_dot( test ){
+        let report = this.report;
+        if( test.failed ) {
+            report.failed();
+            return;
         }
 
-
-        report.end();
-    }
-};
-
-export class Test {
-    constructor(){
-        this.numberofAsserts = 0;
-        this.anyAssert = false;
-    }
-    runTest( method ){
-        var timer = new myclock();
-        timer.start();
-        this[method]();
-        timer.stop();
-        this.timer = timer;
-    }
-    assertTrue( condicion, mensaje = "" ){
-        this.numberofAsserts++;
-        this.anyAssert = true;
-        if( mensaje === ""){
-            mensaje = "assertTrue fails"; 
+        report.ok();
+        if( test.any_assert() ) {
+            report.dot();
+            return;
         }
-        if( ! condicion ){
-            throw new Error( mensaje );
-        }
+        report.add_error( test.class_name + ":" + test.metodo + "() : OK but no assertions were made!\n" );
+        report.risky();
+        return;
     }
-    assertFalse( condicion, mensaje = ""){
-        this.assertTrue( !condicion, mensaje );
+    /*
+     * verify if we are really done
+     * 
+     * if there's no output, it might means a test are not executing done()
+     */
+    all_done = false;
+    check_done( test ){
+
+        let report = this.report;
+        this.#print_dot( test )
+
+
+        if( this.running ) {
+            return false;
+        }
+
+        let all_done = this.is_all_done(  );
+        if( all_done ) {
+            report.end();
+        }
+        this.all_done = true;
+
+        return all_done;
+
     }
 
-    assertEquals( expected, actual, mensaje = ""){
-        this.numberofAsserts++;
-        this.anyAssert = true;
+    runners = [ ];
 
-        mensaje = "assert that "+actual+" is "+expected;
-        if( expected !== actual ){
-            throw new Error( mensaje );
-        }
+    running = false;
+
+    run( ){
+        this.running = true;
+
+        let report = this.report;
+        let self = this;
+        let one_fail = false;
+
+//        let runners = [];
+
+        this.tests.forEach( function ( test ){
+            if( one_fail ){
+                return;
+            }
+            let class_name = test.constructor.name;
+            test.getTestMethods( );
+
+            let metodos = test.getMethods( );
+            
+            metodos.forEach( function ( metodo ){
+                let timer = new myclock();
+                let runner = new TestRunner( class_name, metodo );
+                runner.timer = timer;
+
+                report.add_timer( class_name, metodo, timer );
+
+                self.runners.push( runner );
+                runner.set_suite( self );
+
+                report.total();
+                /*
+                 * hack para resolver tema setup() entre varios tests
+                 */
+                
+                if( test["setup"] !== undefined ){
+                    runner.setup = test.setup;
+                }
+
+                runner.start( metodo );
+                runner[metodo] = test[metodo];
+                
+                try {
+                    runner[metodo]();    
+                } catch( e ) {
+                    one_fail = true;
+                    console.log( "testSuite error: ", e )
+                    runner.done_fail();
+                }
+//                console.log( runner.class_name , runner.metodo, runner.failed )
+                if( runner.failed ){
+                    one_fail = true;
+                }
+            } );
+
+        } );
+
+        this.running = false;
+//        console.log( " FIN MAIN ", this.runners.length )    
+
+        /* border case: just 1 test 
+         * done() should be executed before reaching this line
+         */
+//        if( !this.all_done && this.is_all_done( ) ) {
+        if( this.is_all_done( ) ) {
+            this.report.end();
+            return;
+        } 
+
+        
+
+
     }
     
-    // TODO: remove?
-    wait(ms){
-        var start = new Date().getTime();
-        var end = start;
-        while(end < start + ms) {
-            end = new Date().getTime();
-        }
+    unfinished(){
+        // list unfinished tests
+        this.runners.forEach( function( runner ){
+            if( runner.muy_done ){
+                return;
+            }
+            console.log( "unfinished test: " , runner.class_name, runner.metodo );
+        })        
     }
 
 }
+
+
+
+
+export { TestSuite, Test, TestBad }

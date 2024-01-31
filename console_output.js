@@ -1,5 +1,6 @@
-export class console_output {
+class console_output {
     constructor(){
+        // ansi color codes for bash running under konsole (others might work)
         this.FgBlack = "\x1b[30m";
         this.FgWhite = "\x1b[37m";
         this.BgGreen = "\x1b[42m";
@@ -56,3 +57,5 @@ export class console_output {
     
 
 }
+
+export {console_output} 

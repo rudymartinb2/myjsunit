@@ -1,4 +1,4 @@
-export class browser_log_output {
+class browser_log_output {
     constructor(){
         this.FgBlack = "";
         this.FgWhite = "";
@@ -56,3 +56,5 @@ export class browser_log_output {
     
 
 }
+
+export {browser_log_output}

@@ -1,10 +1,65 @@
 # myjsunit
-NodeJS based minimalistict framework for Linux console based on PHPUnit.
 
-Almost no dependencies: just nodejs, a linux terminal and inotifywait (optional but highly recommended).-
+myjsunit is a minimalistic testing framework for Node.js, inspired by PHPUnit. It provides a simple and intuitive way to write and execute test cases for your Node.js projects.
 
-Alpha version. You might need to edit testjs.sh to suit your needs. Comments are welcome.
+## Features
 
-While developing a project, on a secondary monitor/desktop you can have a terminal running testjs.sh from your project source directory. Each time you write a file on disk it will fire the tests.
+- Lightweight and easy to use.
+- Supports writing test cases using ES6 classes and syntax.
+- Provides assertion methods for common testing scenarios.
+- Generates detailed test reports with pass/fail status, timings, and more.
+- Easily extensible for custom test case implementations.
 
-An attept to write a browser report was made but it's incomplete. There's a browser console report which works like the terminal but you will need to refresh the page to run the tests.
+## Installation
+
+You can install myjsunit using npm:
+
+```
+npm install myjsunit
+```
+
+## Usage
+
+1. Create your test suite file, which includes your test cases.
+
+2. Use the myjsunit test runner to execute your test suite.
+
+Example usage:
+
+```
+node node_modules/myjsunit/myrunner.js path/to/your/testSuite.js
+```
+
+## Writing Test Cases
+
+1. Import the `Test` class from `myjsunit` to create test cases.
+
+2. Extend the `Test` class and implement your test methods using descriptive names. All methods must start with the word "test" (lowercase) in order to be run.
+
+3. Use the provided assertion methods such as `assertTrue`, `assertFalse`, `assertEquals`, etc., to validate your test conditions.
+
+4. Use this.done() to indicate when no more assertions are left to be done for this particular test method. This is important in the case of promises when evaluating inside a callback.
+
+Example test case:
+
+```javascript
+import { Test } from 'myjsunit';
+
+class MyTestCase extends Test {
+    test_example() {
+        this.assertTrue(true, 'Example test case should pass');
+        this.done();
+    }
+}
+
+export { MyTestCase };
+```
+
+## Contributing
+
+Contributions are welcome! If you find any bugs or have suggestions for improvements, please open an issue or submit a pull request on the GitHub repository.
+
+## License
+
+myjsunit is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+

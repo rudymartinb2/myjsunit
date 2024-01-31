@@ -1,18 +1,17 @@
-export class myclock {
+class myclock {
     constructor(){
-        this.startTime;
-        this.endTime;        
     }
     start(){
-        this.startTime = new Date();        
+        this.startTime2 = performance.now();        
     }
     stop(){
-        this.endTime = new Date();
-        this.timeDiff = this.endTime - this.startTime; //in ms
-        // strip the ms
-//        this.timeDiff /= 1000;
+        this.endTime2 = performance.now();        
+        this.timeDiff2 = this.endTime2 - this.startTime2; //in ms
     }
     diff(){
-        return this.timeDiff;
+        return this.timeDiff2.toFixed(2);
     }
 }
+
+
+export {myclock} 
