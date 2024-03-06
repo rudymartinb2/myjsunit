@@ -3,7 +3,7 @@
  * corroborar que el framework atienda .done() durante la ejecuccion de Promises
  * 
  */
-import { Test } from "../../testSuite.js";
+import { Test } from "../../src/testSuite.js";
 
 function getSumNum( a, b ){
     const customPromise = new Promise( function( resolve, reject ) {
@@ -21,6 +21,9 @@ function getSumNum( a, b ){
 }
 
 class promise_Test extends Test {
+    
+    
+    
     /*  caso 1 objeto basico. tengo 2 elemenbtos y los quiero invertidos.
      */
     test_normal(){

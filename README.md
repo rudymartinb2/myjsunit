@@ -1,6 +1,6 @@
 # myjsunit
 
-myjsunit is a minimalistic testing framework for Node.js, inspired by PHPUnit. It provides a simple and intuitive way to write and execute test cases for your Node.js projects.
+myjsunit is a minimalistic testing framework for Node.js, inspired by PHPUnit. 
 
 ## Features
 

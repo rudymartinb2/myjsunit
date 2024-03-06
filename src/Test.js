@@ -1,12 +1,13 @@
 /* 
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Other/javascript.js to edit this template
+ * 
  */
 
 
 
 
 class Test {
+    
+    
     metodos = [ ];
     
 
@@ -18,7 +19,7 @@ class Test {
         return this.metodos;
     }
 
-    // stolen from SO ... 
+    // idea stolen from SO ... 
     #getTestMethods__(  ){
         let properties = new Set();
         let currentObj = this;
@@ -36,54 +37,14 @@ class Test {
             );
         }
     }
-}
-
-
-class TestBad extends Test {
-    test_bad(){
-        this.assertTrue( false );
-        this.done( false );
-    }
     
+        
     
-}
-
-
-
-
-/*
- * idea: 1 runner for a simple method.
- * promises can complicate things. thats why I ended up doing it this way.
- */
-
-class TestRunner {
-
-    // debugging only
-    // 
-    nombre_function(){
-        try {
-            throw new Error( "ERROR: not really an error!" );
-        } catch( e ) {
-            let stack = e.stack;
-            let vector = stack.split( /\r?\n/ );
-
-            //     at TestRunner.test_sarasa (file:///sarasa.js:46:22)
-            let line = vector[2];
-            let rex = /(?=(?! at ))([^\(\s]+)/mg;
-            let result = line.match( rex );
-            return result[1];
-        }
-    }
-
-    
-    
-    // pure methods names 
-    metodos = [ ];
+    // pure methods names ??
+    metodos = [ ]; // que es esto al final?
 
     metodos_number_of_asserts = [ ];
     muy_done = false;
-//    metodos_done = [ ];
-//    metodos_timers = [ ];
 
     timer = null;
     anyAssert = [ ];
@@ -104,9 +65,9 @@ class TestRunner {
 
     done( ){
         let metodo = this.metodo;
+//        console.log( "metodo", metodo )
   
         if( this.muy_done ) {
-//            return;
             throw new Error( "done() was called twice on the same test?" );
         }
         this.muy_done = true;
@@ -115,31 +76,19 @@ class TestRunner {
 
         this.ts.dump_test_time( this.constructor.name, metodo, this.timer.diff() );
 
-//        console.log( " is_all_done", this.ts.is_all_done( this ) );
-
-        this.ts.check_done( this )
-//        console.log( " check_done",  );
+        this.ts.check_done( this );
     }
-
+    
     done_fail( ){
-        let metodo = this.metodo;
-
-        this.muy_done = true;
         this.failed = true;
+        this.done();
+        return;
 
-        this.timer_stop();
-
-        this.ts.dump_test_time( this.constructor.name, metodo, this.timer.diff() );
-
-//        console.log( " is_all_done", this.ts.is_all_done( this ) );
-
-        this.ts.check_done( this )
-//        console.log( " check_done",  );
     }
+
 
     any_assert(){
-
-        return this.anyAssert[ this.running ];
+        return this.anyAssert[ this.metodo ];
     }
 
     set_suite( ts ){
@@ -155,7 +104,7 @@ class TestRunner {
         if( this.muy_done ) {
             throw new Error( "Assert found after test done()" )
         }
-        let metodo = this.running;
+        let metodo = this.metodo;
 
         this.metodos_number_of_asserts[ metodo ]++;
         this.ts.report.assertsRun( 1 );
@@ -183,18 +132,20 @@ class TestRunner {
 
     assertEquals( expected, actual, msg = "equals" ){
         this.#assert();
+        
+        let str_expected = JSON.stringify( expected ) ;
+        let str_actual = JSON.stringify( actual ) ;
 
-//        let mensaje = msg + " : assert that \n" + JSON.stringify( actual ) + " \n is \n" + JSON.stringify( expected );
-        if( JSON.stringify( expected ) === JSON.stringify( actual ) ) {
+        if( str_expected === str_actual ) {
             return;
         }
-        this.#error2( msg, JSON.stringify(actual), JSON.stringify(expected) );
+        this.#error2( msg, str_actual, str_expected );
     }
 
     #error( mensaje ){
         let self = this;
         this.failed = true;
-//        this.done_fail();
+
         try {
             throw new Error( mensaje );
         } catch( e ) {
@@ -207,7 +158,7 @@ class TestRunner {
     #error2( msg, actual, expected ){
         let self = this;
         this.failed = true;
-//        this.done_fail();
+        
         try {
             throw new Error( msg );
         } catch( e ) {
@@ -223,11 +174,39 @@ class TestRunner {
 
     metodo = "";
     class_name = "";
+    
+    /*
+     * TODO: eliminar class_name ?
+     */
     constructor( class_name, metodo ){
         this.class_name = class_name;
+//        if( class_name !== undefined && this.constructor.name !== class_name ){
+//            throw new Error( this.constructor.name+ " != " + class_name );
+//        }
         this.metodo = metodo;
     }
-
+    
+    
+    static create( class_name, metodo ){
+//        console.log( class_name, metodo, module )
+        return new this( class_name, metodo );
+    }
+    
+    
 }
 
-export { Test, TestBad, TestRunner }
+
+class TestBad extends Test {
+    test_bad(){
+        this.assertTrue( false );
+        this.done( false );
+    }
+    
+    
+}
+
+
+
+
+
+export { Test, TestBad }
