@@ -11,6 +11,9 @@ class fakeSuite {
     dump_test_time(){
         
     }
+    get_report(){
+        
+    }
     check_done(){
         
     }

@@ -12,11 +12,22 @@ myjsunit is a minimalistic testing framework for Node.js, inspired by PHPUnit.
 
 ## Installation
 
-You can install myjsunit using npm:
+Until the package is stable, I won't publish it to npm. At the moment just clone the repo and add a reference to your package.json, something like this
 
 ```
-npm install myjsunit
+{
+    "type": "module",
+    "scripts": {
+        "test": "node node_modules/myjsunit/myrunner.js /home/rudy/37sur/oltsm2/testsjs/myTestSuite.js"
+    },
+    "dependencies": {
+        "myjsunit": "file:../myjsunit",
+        (...)
+    }
+}
 ```
+
+if something goes wrong install the package from filesystem using npm.
 
 ## Usage
 
@@ -54,6 +65,10 @@ class MyTestCase extends Test {
 
 export { MyTestCase };
 ```
+
+## TO-DO
+
+There is a lot of clean up to be done.
 
 ## Contributing
 

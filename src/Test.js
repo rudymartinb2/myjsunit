@@ -1,26 +1,13 @@
 /* 
  * 
+ * 
  */
 
 
 
 
 class Test {
-    
-    
-    metodos = [ ];
-    
-
-    getMethods( ){
-        return this.metodos;
-    }
     getTestMethods( ){
-        this.metodos = this.#getTestMethods__();
-        return this.metodos;
-    }
-
-    // idea stolen from SO ... 
-    #getTestMethods__(  ){
         let properties = new Set();
         let currentObj = this;
         let obj = this;
@@ -37,80 +24,65 @@ class Test {
             );
         }
     }
-    
-        
-    
-    // pure methods names ??
-    metodos = [ ]; // que es esto al final?
 
-    metodos_number_of_asserts = [ ];
-    muy_done = false;
 
-    timer = null;
-    anyAssert = [ ];
 
-    ts = null;
-
-    start(  ){
-        this.failed = false;
-        this.timer_start();
-    }
-    
-    timer_stop(){
-        this.timer.stop();
-    }
-    timer_start(){
-        this.timer.start();
-    }
 
     done( ){
-        let metodo = this.metodo;
+        let metodo = this.#metodo;
 //        console.log( "metodo", metodo )
   
-        if( this.muy_done ) {
+        if( this.#really_done ) {
             throw new Error( "done() was called twice on the same test?" );
         }
-        this.muy_done = true;
+        this.#really_done = true;
 
-        this.timer_stop();
+        this.#timer.stop();
 
-        this.ts.dump_test_time( this.constructor.name, metodo, this.timer.diff() );
+// esto esta mal.
+        let report = this.#ts.get_report();
+        
+        let clase = this.constructor.name; // ???
+        let txt = clase + ":" + metodo + "() " ;
+        this.#ts.dump_test_time( txt, this.#timer.diff() );
+//        this.#ts.dump_test_time( this.constructor.name, metodo, this.#timer.diff() );
 
-        this.ts.check_done( this );
+        this.#ts.check_done( this );
     }
     
     done_fail( ){
-        this.failed = true;
+        this.#failed = true;
         this.done();
-        return;
-
     }
 
 
     any_assert(){
-        return this.anyAssert[ this.metodo ];
-    }
-
-    set_suite( ts ){
-        this.ts = ts;
+        return this.#anyAssert;
     }
 
     is_all_done(){
-        return this.muy_done;
-
+        return this.#really_done;
     }
 
     #assert(){
-        if( this.muy_done ) {
+        if( this.#really_done ) {
             throw new Error( "Assert found after test done()" )
         }
-        let metodo = this.metodo;
+        
 
-        this.metodos_number_of_asserts[ metodo ]++;
-        this.ts.report.assertsRun( 1 );
-        this.anyAssert[ metodo ] = true;
-
+        this.#metodos_number_of_asserts++;
+        this.#ts.report.assertsRun( 1 );
+        this.#anyAssert = true;
     }
+    
+    getNumAsserts(){
+//        return this.#metodos_number_of_asserts[ this.metodo ];
+        return this.#metodos_number_of_asserts;
+    }
+    getNumAsserts2(){
+        return this.#metodos_number_of_asserts;
+    }
+    
     assertTrue( condicion, msg = "" ){
         this.#assert();
         if( condicion === true ) {
@@ -130,6 +102,19 @@ class Test {
         this.#error( mensaje );
     }
 
+    #error( mensaje ){
+        let self = this;
+        this.#failed = true;
+
+        try {
+            throw new Error( mensaje );
+        } catch( e ) {
+            let report = this.#ts.report;
+            report.add_error( self.#class_name + ":" + self.#metodo );
+            report.add_error( e.stack + "\n" );
+        }
+    }
+    
     assertEquals( expected, actual, msg = "equals" ){
         this.#assert();
         
@@ -139,57 +124,62 @@ class Test {
         if( str_expected === str_actual ) {
             return;
         }
-        this.#error2( msg, str_actual, str_expected );
+        this.#error_equals( msg, str_actual, str_expected );
     }
 
-    #error( mensaje ){
+    #error_equals( msg, actual, expected ){
         let self = this;
-        this.failed = true;
-
-        try {
-            throw new Error( mensaje );
-        } catch( e ) {
-            let report = this.ts.report;
-            report.add_error( self.class_name + ":" + self.metodo );
-            report.add_error( e.stack + "\n" );
-        }
-    }
-
-    #error2( msg, actual, expected ){
-        let self = this;
-        this.failed = true;
+        this.#failed = true;
         
         try {
             throw new Error( msg );
         } catch( e ) {
-            let report = this.ts.report;
+            let report = this.#ts.report;
             report.add_error( msg +": assert that" );
             report.add_error( actual  );
             report.add_error( "is" );
             report.add_error( expected );
-            report.add_error( self.class_name + ":" + self.metodo +" "+ e.stack + "\n" );
+            report.add_error( self.#class_name + ":" + self.#metodo +" "+ e.stack + "\n" );
             
         }
     }
 
-    metodo = "";
-    class_name = "";
-    
-    /*
-     * TODO: eliminar class_name ?
-     */
-    constructor( class_name, metodo ){
-        this.class_name = class_name;
-//        if( class_name !== undefined && this.constructor.name !== class_name ){
-//            throw new Error( this.constructor.name+ " != " + class_name );
-//        }
-        this.metodo = metodo;
+    #failed = false;
+    start(  ){
+        this.#failed = false;
+        this.#timer.start();
     }
     
+
+    #metodo = "";
+    #class_name = "";
     
+        
+    #metodos_number_of_asserts = 0;
+    
+    #really_done = false; // "done" is defined as function
+    #anyAssert = false;
+
+    #timer = null;
+    
+    set_timer( t ){
+        this.#timer = t ;
+    }
+
+    #ts = null;
+    
+    set_suite( ts ){
+        this.#ts = ts;
+    }
+    
+
+    // atm those params are only useful for error messages
     static create( class_name, metodo ){
+        let self = new this( );
+        self.class_name = class_name;
+        self.#metodo = metodo;
 //        console.log( class_name, metodo, module )
-        return new this( class_name, metodo );
+        return self;
     }
     
     
@@ -201,8 +191,6 @@ class TestBad extends Test {
         this.assertTrue( false );
         this.done( false );
     }
-    
-    
 }
 
 

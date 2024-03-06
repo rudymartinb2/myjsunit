@@ -18,12 +18,6 @@ import { Test, TestBad  } from "./Test.js";
 
 
 class TestSuite {
-    tests = [ ];
-    report = null;
-
-    constructor(){
-
-    }
 
     setup(){
         var report = new console_report();
@@ -32,46 +26,46 @@ class TestSuite {
         this.report = report;
     }
 
-    mostrar_tiempos = false;
-    mayor_1 = true;
+    show_times(){
+        this.#mostrar_tiempos = true; 
+    }
+    #mostrar_tiempos = false; 
 
     // dump slow tests
-    dump_test_time( clase, metodo, tiempo ){
-        if( !this.mostrar_tiempos ) {
+    dump_test_time( txt, tiempo ){
+        if( !this.#mostrar_tiempos ) {
             return;
         }
-        if( this.mayor_1 && tiempo < 1 )
-            return;
-
-        // parche para imprimir los tiempos de cada test
-        this.report.add_error( clase + ":" + metodo + "() ", tiempo );
-        
-//        console.log( clase + ":" + metodo + "() ", tiempo )
+        this.report.add_error( txt, tiempo ); // parche para imprimir los tiempos de cada test
     }
 
     is_function( obj ){
-        if( typeof obj !== "function" ){
-            throw new Error("addeTest() must receive a function.-");
+        if( typeof obj !== "function" ) {
+            throw new Error( "addeTest() must receive a function.-" );
         }
     }
 
+    /*
+     * testSuite hace esto:
+     * 
+     import { console_report_Test } from "./src/console_report_Test.js" ;
+     y luego:
+     this.addTest( console_report_Test  );
+     */
     tests_fn = {};
-    addTest( modulo ){
+    addTest( test_modulo ){
         let self = this;
-        this.is_function( modulo );
-        
-        let name = modulo.name;
-        
-        self.debug( "addTest class_name ", name );
-        
-        this.tests_fn[ name ] = function( class_name, method ){
-            self.debug( "fn class_name ", name );
-            // can't replace it as its an static function
-            return modulo.create( class_name, method );
+        this.is_function( test_modulo );
+
+        let name = test_modulo.name;
+
+//        self.debug( "addTest class_name ", name );
+
+        this.tests_fn[ name ] = function ( class_name, method ){
+//            self.debug( "fn class_name ", name );
+            return test_modulo.create( class_name, method );
         };
     }
-    
-
 
     #print_dot( test ){
         let report = this.report;
@@ -89,63 +83,57 @@ class TestSuite {
         report.risky();
         return;
     }
-    
-    
+
     /*
      * verify if we are really done
      * 
      * if there's no output after test run, it means a test is not executing done()
      */
     check_done( test ){
-
-        
         this.#print_dot( test );
 
         if( this.#running ) { // this.run() is not over yet
             return false;
         }
         /*
-         * algo esta mal aca
          */
         let all_done = this.is_all_done(  );
         if( all_done ) {
             this.report.end();
         }
-
         return all_done;
     }
 
     is_all_done(  ){
         let self = this;
         let control = true;
-        let keys = Object.keys( this.runners );
+        let keys = Object.keys( this.#runners );
         keys.forEach( function ( key ){
-            let test = self.runners[ key ];
+            let test = self.#runners[ key ];
             if( !test.is_all_done() ) {
                 self.report.add_error( "Test Case not done(): " + key );
                 control = false;
             }
         } );
         return control;
-    }    
+    }
 
-    runners = {};
+    #runners = {};
 
     #running = false;
 
-    
-    debug( ...txt  ){
+    debug( ...txt ){
 //        console.log( ...txt );
     }
 
     run( ){
         let self = this;
-        
+
         // deberia haber sido un int para llevar la cantidad de run ners en lugar de boolean
         this.#running = true;
 
         let report = this.report;
-        
+
         let one_fail = false;
 
         let tests = Object.keys( this.tests_fn );
@@ -153,52 +141,53 @@ class TestSuite {
 
 
         tests.forEach( function ( constructor_fn ){
-            
+
             // stop at first fail ?
-            if( one_fail ){
+            if( one_fail ) {
                 return;
             }
             let test_fn = self.tests_fn[ constructor_fn ];
             let test = test_fn(); // nueva instanacia del TestCase
             let class_name = test.constructor.name;
-            
-            self.debug( "class_name ", class_name );
-            
-            test.getTestMethods( );
 
-            let metodos = test.getMethods( );
-            
+            self.debug( "class_name ", class_name );
+
+
+
+            let metodos = test.getTestMethods( );
+
             self.debug( "metodos ", metodos );
-            
+
             metodos.forEach( function ( metodo ){
                 self.debug( "run metodo ", metodo );
+
+                
+
+                let runner = test_fn( constructor_fn, metodo ); // nueva instanacia del TestCase
                 
                 let timer = new myclock();
-                
-                let runner = test_fn( constructor_fn, metodo ); // nueva instanacia del TestCase
-                runner.timer = timer;
-
+                runner.set_timer( timer );
                 report.add_timer( constructor_fn, metodo, timer );
 
-                self.runners[class_name+"."+metodo] = runner;
+                self.#runners[class_name + "." + metodo] = runner;
                 runner.set_suite( self );
 
                 report.total();
 
                 runner.start( metodo );
-                
+
                 try {
-                    runner[metodo]();    
+                    runner[metodo]();
                 } catch( e ) {
                     one_fail = true;
-                    
+
                     report.add_error( constructor_fn + ":" + metodo );
                     report.add_error( e );
 //                    console.log( e );
                     runner.done_fail();
                 }
 
-                if( runner.failed ){
+                if( runner.failed ) {
                     one_fail = true;
                 }
             } );
@@ -214,8 +203,19 @@ class TestSuite {
         if( this.is_all_done( ) ) {
             this.report.end();
             return;
-        } 
+        }
 
+    }
+    
+    #tests = [ ];
+    report = null;
+    
+    set_report( r ){
+        this.report = r;
+    }
+    
+    get_report( ){
+        return this.report;
     }
 
 

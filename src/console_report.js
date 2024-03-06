@@ -8,19 +8,22 @@ class console_report {
     assertsRun( number ){
         this.#counters.inc_asserts( number );
     }
+    
     add_timer( classname, method, timer ){
         this.#timers.push( [ classname, method, timer ] );
     }
     
-    stop_main_timer( timer ){
+    stop_main_timer(){
         this.#main_timer.stop();
     }
 
     header(){
         this.#output.normal( "myjsunit - by @RudyMartin " );
+        this.#output.line_break();
         this.#output.normal( "Minimalistic Testing Framework -- vaguely inspired on PHPUnit" );
+        this.#output.line_break();
         this.#output.normal( "Licence: MIT - https://en.wikipedia.org/wiki/MIT_License");
-        this.#output.normal( "");
+        this.#output.line_break();
     }
 
     ok(){

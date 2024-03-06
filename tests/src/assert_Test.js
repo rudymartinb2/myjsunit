@@ -14,18 +14,19 @@ import { fakeReport } from "../doubles/fakeReport.js";
 
 
 class assert_Test extends Test {
-
-    
     
     test_normal(){
-        let t = new Test();
-
         let suite = new fakeSuite();
+        
+        let t = Test.create( "sarasa", "sarasa");
+        t.set_timer( new fakeTimer() );
         t.set_suite( suite )
         t.assertTrue( true );
         t.assertFalse( false );
+        t.done( false );
 
-        this.assertTrue( true );
+//        this.assertEquals( 2,  t.getNumAsserts2()  );
+        this.assertEquals( 2,  t.getNumAsserts()  );
         this.done();
     }
 
@@ -69,9 +70,10 @@ class assert_Test extends Test {
         let actual = "";
 
         let t = new Test();
-        t.timer = new fakeTimer();
+        
 
         let suite = new fakeSuite();
+        t.set_timer( new fakeTimer() );
         t.set_suite( suite )
         t.assertEquals( 1, 2 );
         t.done( );
@@ -89,9 +91,10 @@ class assert_Test extends Test {
         let actual = "";
 
         let t = new Test();
-        t.timer = new fakeTimer();
+
 
         let suite = new fakeSuite();
+        t.set_timer( new fakeTimer() );
         t.set_suite( suite )
 
         t.done( );
@@ -110,7 +113,6 @@ class assert_Test extends Test {
         let actual = "";
 
         let t = new Test();
-        t.timer = new fakeTimer();
 
         let suite = new fakeSuite();
         t.set_suite( suite )
@@ -122,10 +124,11 @@ class assert_Test extends Test {
 
     test_BAD(){
         let t = new TestBad();
-        t.timer = new fakeTimer();
 
         let suite = new fakeSuite();
+        t.set_timer( new fakeTimer() );
         t.set_suite( suite );
+        
         t.test_bad( );
 
 
@@ -154,7 +157,7 @@ class assert_Test extends Test {
         ts.report = new fakeReport();
 
         let t = new Test();
-        t.ts = ts;
+        t.set_suite( ts );
         t.assertTrue( false );
 
 
@@ -168,8 +171,8 @@ class assert_Test extends Test {
         ts.report = new fakeReport();
 
         let t = new Test();
-        t.timer = new fakeTimer();
-        t.ts = ts;
+        t.set_timer( new fakeTimer() );
+        t.set_suite( ts );
 
         t.done_fail();
 

@@ -38,6 +38,8 @@ class testSuite_Test extends Test {
     test_error_2(){
 
         let suite = new TestSuite();
+        suite.show_times()
+        
         suite.report = new fakeReport();
 
         let test = new Test();

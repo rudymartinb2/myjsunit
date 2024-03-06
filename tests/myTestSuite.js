@@ -14,7 +14,7 @@ import { console_report_Test } from "./src/console_report_Test.js" ;
 class myTestSuite extends TestSuite {
 
     start(){
-        
+        this.show_times();
         
         this.addTest( testSuite_Test  );
         

@@ -1,6 +1,4 @@
 
-
-
 import { console_output } from "./src/console_output.js";
 import { console_report } from "./src/console_report.js";
 import { TestSuite, Test } from "./src/testSuite.js";
