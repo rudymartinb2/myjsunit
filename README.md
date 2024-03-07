@@ -41,6 +41,45 @@ Example usage:
 node node_modules/myjsunit/myrunner.js path/to/your/testSuite.js
 ```
 
+## Writing Test Suite
+
+example from tests/myTestSuite.js:
+```javascript
+import { TestSuite } from "../src/testSuite.js" ;
+
+
+import { promise_Test } from "./promise/promise_Test.js" ;
+
+import { assert_Test } from "./src/assert_Test.js" ;
+import { testSuite_Test } from "./src/testSuite_Test.js" ;
+
+import { comparar_claves_Test } from "./src/comparar_claves_Test.js" ;
+import { console_output_Test } from "./src/console_output_Test.js" ;
+import { console_report_Test } from "./src/console_report_Test.js" ;
+
+
+class myTestSuite extends TestSuite {
+
+    start(){
+        
+        this.addTest( promise_Test  );
+        
+        this.addTest( testSuite_Test  );
+        
+        this.addTest( assert_Test  );
+        
+        this.addTest( console_output_Test  );
+        this.addTest( console_report_Test  );
+        
+        this.run();
+    }
+    
+}
+
+export {  myTestSuite }
+```
+
+
 ## Writing Test Cases
 
 1. Import the `Test` class from `myjsunit` to create test cases.
