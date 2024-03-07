@@ -9,6 +9,7 @@ import { testSuite_Test } from "./src/testSuite_Test.js" ;
 import { comparar_claves_Test } from "./src/comparar_claves_Test.js" ;
 import { console_output_Test } from "./src/console_output_Test.js" ;
 import { console_report_Test } from "./src/console_report_Test.js" ;
+import { types_Test } from "./src/types_Test.js" ;
 
 
 class myTestSuite extends TestSuite {
@@ -25,6 +26,7 @@ class myTestSuite extends TestSuite {
 //        this.addTest( comparar_claves_Test  );
         this.addTest( console_output_Test  );
         this.addTest( console_report_Test  );
+        this.addTest( types_Test  );
         
         this.run();
     }

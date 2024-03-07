@@ -4,6 +4,7 @@
 import { Test, TestBad } from "../../src/Test.js";
 import { TestSuite } from "../../src/testSuite.js";
 import { counters } from "../../src/counters.js";
+import { types } from "../../src/types.js";
 
 import { fakeSuite } from "../doubles/fakeSuite.js";
 import { fakeTimer } from "../doubles/fakeTimer.js";
@@ -21,20 +22,7 @@ class testSuite_Test extends Test {
         return suite;
 
     }
-    test_is_function(){
-        let ts = new TestSuite();
-        let esperado = "addeTest() must receive a function.-";
-        let actual = "";
-        
-        try {
-            ts.is_function( null );
-        } catch( e ){
-            
-            actual = e.message;
-        }
-        this.assertEquals( esperado, actual )
-        this.done();
-    }
+
     
     
     /* no sabia bien donde tirar esta prueba ...
@@ -85,6 +73,7 @@ class testSuite_Test extends Test {
         let test = new Test();
         test.timer = new fakeTimer();
         test.test_sarasa = function (){
+            suite.is_all_done();
             throw new Error( " sarasa !" ); // an error happens during test ...
         };
 
@@ -95,12 +84,12 @@ class testSuite_Test extends Test {
 
         suite.addTest( module );
         
-        let module2 = function (){ };
-        module2.create = function (){
-            return test;
-        };
-
-        suite.addTest( module2 );
+//        let module2 = function (){ };
+//        module2.create = function (){
+//            return test;
+//        };
+//
+//        suite.addTest( module2 );
 
         suite.run();
 

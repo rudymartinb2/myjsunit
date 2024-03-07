@@ -1,10 +1,13 @@
 /* 
- * 
+ * 2024 03 07
+ * heavy refactor. 
+ * still looking for a way to extract as much classes as possible.
  * 
  */
 
 
 import { console_report } from "./console_report.js";
+import { types } from "./types.js";
 
 
 import { Test, TestBad  } from "./Test.js";
@@ -12,36 +15,24 @@ import { Test, TestBad  } from "./Test.js";
 
 class TestSuite {
 
-    is_function( obj ){
-        if( typeof obj !== "function" ) {
-            throw new Error( "addeTest() must receive a function.-" );
-        }
-    }
-
     /*
-     * testSuite hace esto:
+     * idea: class testsConstructors
+     * - list= {}
+     * + addTest()
+     * + get( name )
      * 
-     import { console_report_Test } from "./src/console_report_Test.js" ;
-     y luego:
-     this.addTest( console_report_Test  );
      */
-    #tests_constructor = {};
+    #tests_constructors = {};
     addTest( test_module ){
+        types.is_function( test_module, "addTest() must receive a function.-" );
 
-        this.is_function( test_module );
 
         let name = test_module.name;
 
-        /*
-         * if you run the myjsunit test suite (the one inside the package)
-         * you will notice some strange module names like ("module" or "module2"). 
-         * those are emulated from tests
-         */
-        this.#tests_constructor[ name ] = function ( method ){
+        this.#tests_constructors[ name ] = function ( method ){
             return test_module.create( method );
         };
     }
-    
 
     /*
      * verify if we are really done
@@ -54,9 +45,7 @@ class TestSuite {
         if( this.#running ) { // this.run() is not over yet
             return false;
         }
-        
-        /*
-         */
+
         let all_done = this.is_all_done(  );
         if( all_done ) {
             this.#report.end();
@@ -69,11 +58,10 @@ class TestSuite {
         let control = true;
         let keys = Object.keys( this.#runners );
         keys.forEach( function ( key ){
-            // no point in checking the rest if just one test is not done
-            if( ! control ){ 
+            if( !control ) {  // no point in checking the rest if just one test is not done
                 return;
             }
-            
+
             let test = self.#runners[ key ];
             if( !test.is_all_done() ) {
                 control = false;
@@ -82,67 +70,69 @@ class TestSuite {
         return control;
     }
 
+    forEachTestMethod( methods, name_constructor ){
+        let self = this;
+
+        let one_fail = false;
+
+        methods.forEach( function ( method ){
+            let report = self.#report;
+
+            if( one_fail ) {
+                return;
+            }
+            let counters = report.get_counters();
+            counters.inc_tests();
+
+            // another new instance of testcase
+            let test_constructor = self.#tests_constructors[ name_constructor ];
+            let runner = test_constructor( method );
+
+            runner.set_report( report );
+            runner.set_suite( self );
+
+            runner.start();
+
+            self.#runners[name_constructor + "." + method] = runner;
+
+            try {
+                runner[method]();
+            } catch( e ) {
+                one_fail = true;
+                report.add_error( name_constructor + ":" + method );
+                report.add_error( e );
+                runner.done_fail();
+            }
+
+            if( runner.has_failed() ) {
+                one_fail = true;
+            }
+        } );
+        return one_fail;
+    }
+
     run( ){
         let self = this;
 
         this.#running = true;
 
-        let report = this.#report;
-
-        
-
-        let tests = Object.keys( this.#tests_constructor );
-//        self.debug( "tests ", this.tests_fn );
-
+        let testCases = Object.keys( this.#tests_constructors );
 
         let one_fail = false;
-        
-        /*
-         * I do not like the fact I am doing a forEach inside a forEach
-         */
-        tests.forEach( function ( name_constructor ){
-//            console.log( constructor_fn, typeof constructor_fn  )
+
+        testCases.forEach( function ( name_constructor ){
             if( one_fail ) { // stop at first fail 
                 return;
             }
-            
-            let test_constructor = self.#tests_constructor[ name_constructor ];
-            
+
+            let test_constructor = self.#tests_constructors[ name_constructor ];
+
             // create() TestCase just to get the list of test methods
-            let test = test_constructor(); 
+            let testCase = test_constructor();
 
-            let methods = test.getTestMethods( );
+            let methods = testCase.getTestMethods( );
 
-            methods.forEach( function ( method ){
-                let counters = report.get_counters();
-                counters.inc_tests();
-
-                // another new instance of testcase
-                let runner = test_constructor( method ); 
-                
-                runner.set_report( report );
-                runner.set_suite( self );
-                
-                runner.start( method );
-                
-                let timer  = runner.get_timer();
-                report.add_timer( name_constructor, method, timer );
-
-                self.#runners[name_constructor + "." + method] = runner;
-                
-                try {
-                    runner[method]();
-                } catch( e ) {
-                    one_fail = true;
-                    report.add_error( name_constructor + ":" + method );
-                    report.add_error( e );
-                    runner.done_fail();
-                }
-                
-                if( runner.has_failed() ) {
-                    one_fail = true;
-                }
-            } );
+            one_fail = self.forEachTestMethod( methods, name_constructor );
 
         } );
 
@@ -160,32 +150,26 @@ class TestSuite {
 //        }
 
     }
-    
-    
+
     #runners = {};
 
     #running = false;
 
-    
-    #tests = [ ];
     #report = null;
-    
+
     set_report( r ){
         this.#report = r;
     }
-    
-    
+
+    // runs from /myrunner.js
     setup(){
-        var report = new console_report();
+        let report = new console_report();
         report.header();
 
         this.set_report( report );
     }
 
-
 }
-
-
 
 
 export { TestSuite, Test, TestBad }

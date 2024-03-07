@@ -163,6 +163,9 @@ class Test {
         this.set_timer( timer );
         
         this.#timer.start();
+        
+        let report = this.#report;
+        report.add_timer( this.#class_name, this.#metodo, timer );
     }
     
     #failed = false;
