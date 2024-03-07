@@ -51,7 +51,6 @@ class testSuite_Test extends Test {
         let suite = this.setup();
 //        let suite = new TestSuite();
         
-        suite.show_times()
         
 //        suite.report = new fakeReport();
 //        report.set_counters( new counters() )
@@ -115,10 +114,10 @@ class testSuite_Test extends Test {
         let self = this;
         let suite = new TestSuite();
         let report = new fakeReport();
-        report.set_counters( new counters() )
+        report.set_counters( new counters() );
         suite.set_report( report ) ;
 
-        let module = function (){ };
+//        let module = function (){ };
         
         
         let test;
@@ -129,7 +128,7 @@ class testSuite_Test extends Test {
         suite.check_done( test );
       
 
-        this.assertFalse( test.muy_done )
+        this.assertFalse( test.is_all_done() )
         this.done();
 
     }

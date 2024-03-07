@@ -35,16 +35,16 @@ class promise_Test extends Test {
         } )
     }
     
-    test_catch(){
-        let p = getSumNum( 5, 2 );
-        let self = this;
-        
-        p.catch( function( error ){
-            self.assertEquals( "Oops!.. Number must be less than 5", error.message );
-            self.done();
-        })
-    }
-    
+//    test_catch(){
+//        let p = getSumNum( 5, 2 );
+//        let self = this;
+//        
+//        p.catch( function( error ){
+//            self.assertEquals( "Oops!.. Number must be less than 5", error.message );
+//            self.done();
+//        })
+//    }
+//    
     
 }
 

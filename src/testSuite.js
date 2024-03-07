@@ -5,21 +5,12 @@
 
 
 import { console_report } from "./console_report.js";
-import { myclock } from "./myclock.js";
+
 
 import { Test, TestBad  } from "./Test.js";
 
 
 class TestSuite {
-
-
-    // dump slow tests
-//    dump_test_time( txt, tiempo ){
-////        if( !this.#mostrar_tiempos ) {
-////            return;
-////        }
-////        this.report.add_error( txt, tiempo ); // parche para imprimir los tiempos de cada test
-//    }
 
     is_function( obj ){
         if( typeof obj !== "function" ) {
@@ -35,11 +26,11 @@ class TestSuite {
      this.addTest( console_report_Test  );
      */
     #tests_constructor = {};
-    addTest( test_modulo ){
+    addTest( test_module ){
 
-        this.is_function( test_modulo );
+        this.is_function( test_module );
 
-        let name = test_modulo.name;
+        let name = test_module.name;
 
         /*
          * if you run the myjsunit test suite (the one inside the package)
@@ -47,7 +38,7 @@ class TestSuite {
          * those are emulated from tests
          */
         this.#tests_constructor[ name ] = function ( method ){
-            return test_modulo.create( method );
+            return test_module.create( method );
         };
     }
     
@@ -68,7 +59,7 @@ class TestSuite {
          */
         let all_done = this.is_all_done(  );
         if( all_done ) {
-            this.report.end();
+            this.#report.end();
         }
         return all_done;
     }
@@ -94,72 +85,61 @@ class TestSuite {
     run( ){
         let self = this;
 
-        // deberia haber sido un int para llevar la cantidad de run ners en lugar de boolean
         this.#running = true;
 
-        let report = this.report;
+        let report = this.#report;
 
-        let one_fail = false;
+        
 
         let tests = Object.keys( this.#tests_constructor );
 //        self.debug( "tests ", this.tests_fn );
 
 
+        let one_fail = false;
+        
+        /*
+         * I do not like the fact I am doing a forEach inside a forEach
+         */
         tests.forEach( function ( name_constructor ){
 //            console.log( constructor_fn, typeof constructor_fn  )
-            if( one_fail ) { // stop at first fail ?
+            if( one_fail ) { // stop at first fail 
                 return;
             }
             
-            
             let test_constructor = self.#tests_constructor[ name_constructor ];
-            let test = test_constructor(); // nueva instanacia del TestCase
-            let class_name = test.constructor.name;
+            
+            // create() TestCase just to get the list of test methods
+            let test = test_constructor(); 
 
-//            self.debug( "class_name ", class_name );
+            let methods = test.getTestMethods( );
 
-
-
-            let metodos = test.getTestMethods( );
-
-//            self.debug( "metodos ", metodos );
-
-            metodos.forEach( function ( metodo ){
+            methods.forEach( function ( method ){
                 let counters = report.get_counters();
                 counters.inc_tests();
-//                report.total(); // inc cant tests
 
-//                let runner = test_constructor( name_constructor, metodo ); // nueva instanacia del TestCase
-                let runner = test_constructor( metodo ); // nueva instanacia del TestCase
+                // another new instance of testcase
+                let runner = test_constructor( method ); 
                 
                 runner.set_report( report );
-                
                 runner.set_suite( self );
                 
-                runner.start( metodo );
+                runner.start( method );
                 
                 let timer  = runner.get_timer();
-                
-                report.add_timer( name_constructor, metodo, timer );
+                report.add_timer( name_constructor, method, timer );
 
-                self.#runners[class_name + "." + metodo] = runner;
+                self.#runners[name_constructor + "." + method] = runner;
                 
-
-                
-
-                
-
                 try {
-                    runner[metodo]();
+                    runner[method]();
                 } catch( e ) {
                     one_fail = true;
-
-                    report.add_error( name_constructor + ":" + metodo );
+                    report.add_error( name_constructor + ":" + method );
                     report.add_error( e );
                     runner.done_fail();
                 }
-
-                if( runner.failed ) {
+                
+                if( runner.has_failed() ) {
                     one_fail = true;
                 }
             } );
@@ -171,11 +151,13 @@ class TestSuite {
 
         /* border case: just 1 test 
          * done() should be executed before reaching this line
+         * 
+         * update: prolly not needed anymore
          */
-        if( this.is_all_done( ) ) {
-            this.report.end();
-            return;
-        }
+//        if( this.is_all_done( ) ) {
+//            this.#report.end();
+//            return;
+//        }
 
     }
     
@@ -184,28 +166,14 @@ class TestSuite {
 
     #running = false;
 
-    debug( ...txt ){
-//        console.log( ...txt );
-    }
-
-    
-    
-    show_times(){
-//        this.#mostrar_tiempos = true; 
-    }
-//    #mostrar_tiempos = false; 
-
     
     #tests = [ ];
-    report = null;
+    #report = null;
     
     set_report( r ){
-        this.report = r;
+        this.#report = r;
     }
     
-    get_report( ){
-        return this.report;
-    }
     
     setup(){
         var report = new console_report();

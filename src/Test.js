@@ -42,6 +42,10 @@ class Test {
         this.#ts.check_done( this );
     }
     
+    has_failed(){
+        return this.#failed;
+    }
+    
     done_fail( ){
         this.#failed = true;
         this.done();

@@ -4,8 +4,7 @@ import { myclock } from "./myclock.js";
 import { console_output } from "./console_output.js";
 import { counters } from "./counters.js";
 
-/*
- * I need to extract counter class from this and use it directly from where? 
+/* 
  */
 
 class console_report {
@@ -26,12 +25,12 @@ class console_report {
     
     failed(){
         this.#counters.inc_failed();
-        this.#output.fail( "E" ); // E "dot"
+        this.#output.fail( "E" ); 
     }
 
     risky(){
         this.#counters.inc_risky();
-        this.#output.risky( "R" ); // R "dot"
+        this.#output.risky( "R" );
     }
 
     dot(){
@@ -53,37 +52,52 @@ class console_report {
         this.#output.line_break();
 
         if( ! counters.is_ok() ) {
+            // show errors before printing totals
             this.list_errors();
-            // bash scripts could need this
-            process.exitCode = 1;
+            process.exitCode = 1; // a bash script could need this
         }
 
         this.print_total_asserts();
         this.print_time_spent();
     }
     
+    // then we print a gree/red bar
     print_total_asserts(){
-        // "Tests Total: "+tests_count +" Asserts: "+ this.counters.asserts +"  Passed: "+ok+"  Failed: "+failed+"  Risky: "+risky;
-        var text = this.#counters.get_totals_text();
 
         this.#output.line_break();
 
         // default case
-        this.#output.set_ok_color( );
+        this.#output.set_ok_color( ); // green bh
         
-        if( this.#counters.is_risky() ) {
-            this.#output.set_risky_color();
+        if( this.#counters.is_risky() ) { 
+            this.#output.set_risky_color(); // brown bg
         }
-        if( this.#counters.is_failed() ) {
-            this.#output.set_fail_color();
+        if( this.#counters.has_failed() ) { 
+            this.#output.set_fail_color(); // red bg
         }
+
+        var text = this.#counters.get_totals_text();
         this.#output.normal( text );
 
         this.#output.line_break();
     }
 
     print_time_spent(){
-        let average = this.#main_timer.diff() / this.#counters.get_tests();
+        let ret = this.#calculate_time_spent();
+        let max = ret.max;
+        let which_class = ret.which_class;
+        let which_method = ret.which_method;        
+        
+        this.#output.line_break();
+        this.#output.text_normal( "Total = " + this.#main_timer.diff() + " msecs.-" );
+
+        this.#output.line_break();
+
+        this.#output.text_normal( "Slowest test: " + which_class + "." + which_method + " = " + max + " msecs.-" );
+        this.#output.line_break();
+    }
+    
+    #calculate_time_spent(){
         let max = 0;
         let which_class = "";
         let which_method = "";
@@ -100,15 +114,14 @@ class console_report {
                 max = spent;
             }
         } );
-        this.#output.line_break();
-        this.#output.text_normal( "Total = " + this.#main_timer.diff() + " msecs / Test Average = " + average.toFixed( 3 ) + " msecs" );
-
-        this.#output.line_break();
-
-        if( max > average ) {
-            this.#output.text_normal( "Slowest test: " + which_class + "." + which_method + " = " + max + " msecs" );
-            this.#output.line_break();
-        }
+        let ret = {
+            max : max,
+            which_class : which_class,
+            which_method : which_method
+        };
+        
+        return  ret;
+        
     }
 
 
@@ -155,6 +168,7 @@ class console_report {
     }
 
     #main_timer;
+    
     constructor( output ){
         if( output === undefined ) {
             output = new console_output();
@@ -167,8 +181,8 @@ class console_report {
         
         this.#main_timer = new myclock();
         this.#main_timer.start();
-
     }
+    
 
 }
 

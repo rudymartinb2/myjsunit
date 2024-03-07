@@ -12,7 +12,7 @@ class fakeSuite {
         
     }
     get_report(){
-        
+        return this.report;
     }
     check_done(){
         

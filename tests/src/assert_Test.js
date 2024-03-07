@@ -35,9 +35,8 @@ class assert_Test extends Test {
         
         t.assertTrue( true );
         t.assertFalse( false );
-        t.done( false );
+        t.done( );
 
-//        this.assertEquals( 2,  t.getNumAsserts2()  );
         this.assertEquals( 2,  t.getNumAsserts()  );
         this.done();
     }
@@ -46,10 +45,9 @@ class assert_Test extends Test {
         let t = this.setup()
         
         t.assertTrue( false );
-        t.assertFalse( true );
 
+        this.assertEquals( true,  t.has_failed()  );
 
-        this.assertTrue( true );
         this.done();
     }
 
@@ -58,7 +56,7 @@ class assert_Test extends Test {
         
         t.assertEquals( 1, 1 );
 
-        this.assertTrue( true );
+        this.assertEquals( 1,  t.getNumAsserts()  );
         this.done();
     }
 
@@ -67,11 +65,11 @@ class assert_Test extends Test {
         
         t.assertEquals( 1, 2 );
 
-        this.assertTrue( true );
+        this.assertEquals( true,  t.has_failed()  );
         this.done();
     }
 
-    test_done_done(){
+    test_done_twice(){
         let esperado = "done() was called twice on the same test?";
         let actual = "";
 
@@ -88,6 +86,7 @@ class assert_Test extends Test {
         this.assertEquals( esperado, actual );
         this.done();
     }
+    
     test_done_assert(){
         let esperado = "Assert found after test done()";
         let actual = "";
@@ -137,52 +136,6 @@ class assert_Test extends Test {
         this.done();
     }
 
-    // another special case 
-    test_NO_TERMINA(){
-        let ts = new TestSuite();
-        ts.report = new fakeReport();
-
-
-        ts.addTest( Test );
-
-
-        ts.is_all_done();
-
-        this.assertTrue( true );
-        this.done();
-
-    }
-
-    test_FALLA_3(){
-//        let ts = new TestSuite();
-        let ts = new fakeSuite();
-
-        let t = this.setup()
-//        let t = new Test();
-//        t.set_suite( ts );
-//        t.set_report( new fakeReport );
-        
-        t.assertTrue( false );
-
-
-        this.assertTrue( true );
-        this.done();
-    }
-
-//    test_done_fail(){
-////        let ts = new TestSuite();
-//        let ts = new fakeSuite();
-//        ts.report = new fakeReport();
-//
-//        let t = new Test();
-//        t.set_timer( new fakeTimer() );
-//        t.set_suite( ts );
-//
-//        t.done_fail();
-//
-//        this.assertTrue( true );
-//        this.done();
-//    }
 
     
 

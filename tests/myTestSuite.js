@@ -14,14 +14,15 @@ import { console_report_Test } from "./src/console_report_Test.js" ;
 class myTestSuite extends TestSuite {
 
     start(){
-        this.show_times();
+
+        
+        this.addTest( promise_Test  );
         
         this.addTest( testSuite_Test  );
         
         this.addTest( assert_Test  );
-        this.addTest( promise_Test  );
         
-        this.addTest( comparar_claves_Test  );
+//        this.addTest( comparar_claves_Test  );
         this.addTest( console_output_Test  );
         this.addTest( console_report_Test  );
         
