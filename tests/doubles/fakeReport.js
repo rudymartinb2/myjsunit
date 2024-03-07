@@ -31,6 +31,13 @@ class fakeReport {
     add_error(){
         
     }
+    set_counters( c ){
+        this.c = c;
+        
+    }
+    get_counters(){
+        return this.c;
+    }
 }
 
 export { fakeReport }

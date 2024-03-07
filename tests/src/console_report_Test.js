@@ -21,7 +21,7 @@ class console_report_Test extends Test {
         cr.set_output( co );
         
         
-        cr.has_failed();
+//        cr.has_failed();
         cr.failed();
         cr.risky();
         cr.list_errors();

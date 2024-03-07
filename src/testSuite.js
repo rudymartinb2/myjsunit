@@ -14,12 +14,12 @@ class TestSuite {
 
 
     // dump slow tests
-    dump_test_time( txt, tiempo ){
-        if( !this.#mostrar_tiempos ) {
-            return;
-        }
-        this.report.add_error( txt, tiempo ); // parche para imprimir los tiempos de cada test
-    }
+//    dump_test_time( txt, tiempo ){
+////        if( !this.#mostrar_tiempos ) {
+////            return;
+////        }
+////        this.report.add_error( txt, tiempo ); // parche para imprimir los tiempos de cada test
+//    }
 
     is_function( obj ){
         if( typeof obj !== "function" ) {
@@ -51,10 +51,6 @@ class TestSuite {
         };
     }
     
-    // esto tiene que volar a report
-    #print_dot( test ){
-        this.report.print_dot( test );
-    }
 
     /*
      * verify if we are really done
@@ -62,12 +58,12 @@ class TestSuite {
      * if there's no output after test run, it means a test is not executing done()
      */
     check_done( test ){
-//        this.#print_dot( test );
-        this.report.print_dot( test );
+        test.print_dot( test );
 
         if( this.#running ) { // this.run() is not over yet
             return false;
         }
+        
         /*
          */
         let all_done = this.is_all_done(  );
@@ -82,9 +78,13 @@ class TestSuite {
         let control = true;
         let keys = Object.keys( this.#runners );
         keys.forEach( function ( key ){
+            // no point in checking the rest if just one test is not done
+            if( ! control ){ 
+                return;
+            }
+            
             let test = self.#runners[ key ];
             if( !test.is_all_done() ) {
-                self.report.add_error( "Test Case not done(): " + key );
                 control = false;
             }
         } );
@@ -125,10 +125,14 @@ class TestSuite {
 //            self.debug( "metodos ", metodos );
 
             metodos.forEach( function ( metodo ){
-                report.total(); // inc cant tests
+                let counters = report.get_counters();
+                counters.inc_tests();
+//                report.total(); // inc cant tests
 
 //                let runner = test_constructor( name_constructor, metodo ); // nueva instanacia del TestCase
                 let runner = test_constructor( metodo ); // nueva instanacia del TestCase
+                
+                runner.set_report( report );
                 
                 runner.set_suite( self );
                 
@@ -187,9 +191,9 @@ class TestSuite {
     
     
     show_times(){
-        this.#mostrar_tiempos = true; 
+//        this.#mostrar_tiempos = true; 
     }
-    #mostrar_tiempos = false; 
+//    #mostrar_tiempos = false; 
 
     
     #tests = [ ];

@@ -6,6 +6,7 @@
  */
 import { Test, TestBad } from "../../src/Test.js";
 import { TestSuite } from "../../src/testSuite.js";
+import { counters } from "../../src/counters.js";
 
 import { fakeSuite } from "../doubles/fakeSuite.js";
 import { fakeTimer } from "../doubles/fakeTimer.js";
@@ -15,12 +16,23 @@ import { fakeReport } from "../doubles/fakeReport.js";
 
 class assert_Test extends Test {
     
-    test_normal(){
+    
+    setup() {
         let suite = new fakeSuite();
         
         let t = Test.create( "sarasa", "sarasa");
         t.set_timer( new fakeTimer() );
         t.set_suite( suite )
+        let report = new fakeReport();
+        report.set_counters( new counters() );
+        t.set_report( report );
+        return t;
+        
+    }
+    
+    test_normal(){
+        let t = this.setup()
+        
         t.assertTrue( true );
         t.assertFalse( false );
         t.done( false );
@@ -31,10 +43,8 @@ class assert_Test extends Test {
     }
 
     test_false(){
-        let t = new Test();
-
-        let suite = new fakeSuite();
-        t.set_suite( suite )
+        let t = this.setup()
+        
         t.assertTrue( false );
         t.assertFalse( true );
 
@@ -44,10 +54,8 @@ class assert_Test extends Test {
     }
 
     test_equals_OK(){
-        let t = new Test();
-
-        let suite = new fakeSuite();
-        t.set_suite( suite )
+        let t = this.setup()        
+        
         t.assertEquals( 1, 1 );
 
         this.assertTrue( true );
@@ -55,10 +63,8 @@ class assert_Test extends Test {
     }
 
     test_equals_FAIL(){
-        let t = new Test();
-
-        let suite = new fakeSuite();
-        t.set_suite( suite )
+        let t = this.setup()        
+        
         t.assertEquals( 1, 2 );
 
         this.assertTrue( true );
@@ -69,12 +75,8 @@ class assert_Test extends Test {
         let esperado = "done() was called twice on the same test?";
         let actual = "";
 
-        let t = new Test();
+        let t = this.setup()        
         
-
-        let suite = new fakeSuite();
-        t.set_timer( new fakeTimer() );
-        t.set_suite( suite )
         t.assertEquals( 1, 2 );
         t.done( );
         // dado que done() usa throw ...
@@ -89,13 +91,8 @@ class assert_Test extends Test {
     test_done_assert(){
         let esperado = "Assert found after test done()";
         let actual = "";
-
-        let t = new Test();
-
-
-        let suite = new fakeSuite();
-        t.set_timer( new fakeTimer() );
-        t.set_suite( suite )
+        
+        let t = this.setup()
 
         t.done( );
         // dado que done() usa throw ...
@@ -112,22 +109,26 @@ class assert_Test extends Test {
         let esperado = "";
         let actual = "";
 
-        let t = new Test();
-
-        let suite = new fakeSuite();
-        t.set_suite( suite )
+        let t = this.setup()
+        
         t.assertFail( );
 
         this.assertEquals( esperado, actual );
         this.done();
     }
 
+    // special case ...
     test_BAD(){
         let t = new TestBad();
 
         let suite = new fakeSuite();
         t.set_timer( new fakeTimer() );
         t.set_suite( suite );
+        
+        let report = new fakeReport();
+        report.set_counters( new counters() );
+        t.set_report( report );
+
         
         t.test_bad( );
 
@@ -136,6 +137,7 @@ class assert_Test extends Test {
         this.done();
     }
 
+    // another special case 
     test_NO_TERMINA(){
         let ts = new TestSuite();
         ts.report = new fakeReport();
@@ -151,13 +153,15 @@ class assert_Test extends Test {
 
     }
 
-    test_FALLA(){
+    test_FALLA_3(){
 //        let ts = new TestSuite();
         let ts = new fakeSuite();
-        ts.report = new fakeReport();
 
-        let t = new Test();
-        t.set_suite( ts );
+        let t = this.setup()
+//        let t = new Test();
+//        t.set_suite( ts );
+//        t.set_report( new fakeReport );
+        
         t.assertTrue( false );
 
 
@@ -165,20 +169,20 @@ class assert_Test extends Test {
         this.done();
     }
 
-    test_done_fail(){
-//        let ts = new TestSuite();
-        let ts = new fakeSuite();
-        ts.report = new fakeReport();
-
-        let t = new Test();
-        t.set_timer( new fakeTimer() );
-        t.set_suite( ts );
-
-        t.done_fail();
-
-        this.assertTrue( true );
-        this.done();
-    }
+//    test_done_fail(){
+////        let ts = new TestSuite();
+//        let ts = new fakeSuite();
+//        ts.report = new fakeReport();
+//
+//        let t = new Test();
+//        t.set_timer( new fakeTimer() );
+//        t.set_suite( ts );
+//
+//        t.done_fail();
+//
+//        this.assertTrue( true );
+//        this.done();
+//    }
 
     
 

@@ -14,11 +14,20 @@ class counters {
     get_ok(){
         return this.#ok;
     }
+    get_ok_total(){
+        let ok = this.#ok;
+        let tests = this.#tests;
+        return " (" + ok + "/" + tests + ")";
+    }
+    
     get_failed(){
         return this.#failed;
     }
     get_risky(){
         return this.#risky;
+    }
+    get_asserts(){
+        return this.#asserts;
     }
     
     inc_tests(){
@@ -33,21 +42,21 @@ class counters {
     inc_ok(){
         this.#ok++;
     }
-    inc_asserts( number ){
-        this.#asserts += number;
+    inc_asserts( ){
+        this.#asserts ++;
     }
-    // deberia estar esto aca ??
+    
+    // Robert Martin @unclebob says each test should contain only one assert.
     get_totals_text(){
         var failed = this.#failed;
         var risky = this.#risky;
         var ok = this.#ok;
         var tests_count = this.#tests;
-
-        return "Tests Total: " + tests_count + " Asserts: " + this.#asserts + "  Passed: " + ok + "  Failed: " + failed + "  Risky: " + risky;
+        return " Tests Total: " + tests_count + " Asserts: " + this.#asserts + "  Passed: " + ok + "  Failed: " + failed + "  Risky: " + risky+" ";
     }
     
     is_ok(){
-        return this.#failed == 0 && this.#risky == 0;
+        return ! this.is_failed() && ! this.is_risky();
     }
 
     is_failed(){

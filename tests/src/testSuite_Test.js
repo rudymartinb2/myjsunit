@@ -3,13 +3,24 @@
 
 import { Test, TestBad } from "../../src/Test.js";
 import { TestSuite } from "../../src/testSuite.js";
+import { counters } from "../../src/counters.js";
 
 import { fakeSuite } from "../doubles/fakeSuite.js";
 import { fakeTimer } from "../doubles/fakeTimer.js";
 import { fakeReport } from "../doubles/fakeReport.js";
 
 
+
 class testSuite_Test extends Test {
+    
+    setup(){
+        let suite = new TestSuite();
+        let report = new fakeReport();
+        report.set_counters( new counters() )
+        suite.set_report( report ) ;
+        return suite;
+
+    }
     test_is_function(){
         let ts = new TestSuite();
         let esperado = "addeTest() must receive a function.-";
@@ -37,13 +48,17 @@ class testSuite_Test extends Test {
 
     test_error_2(){
 
-        let suite = new TestSuite();
+        let suite = this.setup();
+//        let suite = new TestSuite();
+        
         suite.show_times()
         
-        suite.report = new fakeReport();
+//        suite.report = new fakeReport();
+//        report.set_counters( new counters() )
 
         let test = new Test();
         test.timer = new fakeTimer();
+        
         test.test_sarasa = function (){
             throw new Error( " sarasa !" ); // an error happens during test ...
         };
@@ -64,8 +79,9 @@ class testSuite_Test extends Test {
 
     test_one_fail(){
 
-        let suite = new TestSuite();
-        suite.report = new fakeReport();
+//        let suite = new TestSuite();
+        let suite = this.setup();
+//        suite.report = new fakeReport();
 
         let test = new Test();
         test.timer = new fakeTimer();
@@ -98,67 +114,51 @@ class testSuite_Test extends Test {
 
         let self = this;
         let suite = new TestSuite();
-        suite.report = new fakeReport();
+        let report = new fakeReport();
+        report.set_counters( new counters() )
+        suite.set_report( report ) ;
 
         let module = function (){ };
         
         
         let test;
         test = new Test( "Test", "test_sarasa");
-//        module.create = function (){
-//            
-////            console.log( "create!")
-//            
-//            
-//            
-//            test.timer = new fakeTimer();
-//            test.test_sarasa = function (){
-//                test.done();
-//            };
-//            
-//            
-//            return test;
-//        };
-//
-//        suite.addTest( module );
+        test.set_report( report );
+      
 
         suite.check_done( test );
-        
-//        suite.run();
-//        console.log( suite );
-        
-
+      
 
         this.assertFalse( test.muy_done )
         this.done();
 
     }
     
-    test_dump_test_time_OK(){
-
-        let suite = new TestSuite();
-        suite.report = new fakeReport();
-        suite.mayor_1 = true;
-        suite.mostrar_tiempos = true;
-
-        suite.dump_test_time( "sarasa", "sarasa", 2 ); // > 1
-
-        this.assertTrue( true );
-        this.done();
-    }
-    
-    test_dump_test_time_NO(){
-
-        let suite = new TestSuite();
-        suite.report = new fakeReport();
-        suite.mayor_1 = true;
-        suite.mostrar_tiempos = true;
-
-        suite.dump_test_time( "sarasa", "sarasa", 0 ); // > 1
-
-        this.assertTrue( true );
-        this.done();
-    }
+//    test_dump_test_time_OK(){
+//
+//        let suite = new TestSuite();
+//        suite.report = new fakeReport();
+//        suite.mayor_1 = true;
+//        suite.mostrar_tiempos = true;
+//
+////        suite.dump_test_time( "sarasa", "sarasa", 2 ); // > 1
+//
+//        this.assertTrue( true );
+//        this.done();
+//    }
+//    
+//    test_dump_test_time_NO(){
+//
+//        let suite = new TestSuite();
+//        suite.report = new fakeReport();
+//        suite.mayor_1 = true;
+//        suite.mostrar_tiempos = true;
+//
+////        suite.dump_test_time( "sarasa", "sarasa", 0 ); // > 1
+//
+//        this.assertTrue( true );
+//        this.done();
+//    }
     
 //    test_nada(){
 ////        this.done();

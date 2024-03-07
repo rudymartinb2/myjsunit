@@ -35,16 +35,10 @@ class Test {
         
         this.#really_done = true;
 
-        let metodo = this.#metodo;
-
         this.#timer.stop();
 
-// esto esta mal.
-//        let report = this.#ts.get_report();
-        
-        let clase = this.#class_name; // ???
-        let txt = clase + ":" + metodo + "() " ;
-        this.#ts.dump_test_time( txt, this.#timer.diff() );
+        /* 
+         */
         this.#ts.check_done( this );
     }
     
@@ -55,7 +49,7 @@ class Test {
 
 
     any_assert(){
-        return this.#anyAssert;
+        return this.#metodos_number_of_asserts > 0;
     }
 
     is_all_done(){
@@ -66,53 +60,70 @@ class Test {
         if( this.#really_done ) {
             throw new Error( "Assert found after test done()" )
         }
-        
 
+        // this is just for this particular test. 
         this.#metodos_number_of_asserts++;
-        this.#ts.report.assertsRun( 1 );
-        this.#anyAssert = true;
+        
+        let counters = this.#report.get_counters();
+        
+        counters.inc_asserts();
     }
     
+    print_dot(  ){
+        let test = this;
+        let report = this.#report;
+        if( test.#failed ) {
+            report.failed();
+            return;
+        }
+        
+        let counters = report.get_counters();
+        counters.inc_ok();
+        
+        if( test.any_assert() ) {
+            report.dot();
+            return;
+        }
+        report.add_error( test.get_class_name() + ":" + test.get_method() + "() : OK but no assertions were made!\n" );
+        report.risky();
+    }
+
+    
     getNumAsserts(){
-//        return this.#metodos_number_of_asserts[ this.metodo ];
         return this.#metodos_number_of_asserts;
     }
-    getNumAsserts2(){
-        return this.#metodos_number_of_asserts;
-    }
+
     
     assertTrue( condicion, msg = "" ){
         this.#assert();
-        if( condicion === true ) {
-            return;
+        if( condicion !== true ) {
+            this.#error( msg + " assertTrue fails \n" );
         }
-        let mensaje = msg + " assertTrue fails \n";
-
-        this.#error( mensaje );
     }
 
-    assertFalse( condicion, mensaje = "" ){
-        this.assertTrue( !condicion, mensaje );
+    assertFalse( condition, msg = "" ){
+        this.assertTrue( !condition, msg );
     }
-    assertFail( mensaje = "assertFail() reached" ){
+    assertFail( msg = "assertFail() reached" ){
         this.#assert();
-//        throw new Error( mensaje );
-        this.#error( mensaje );
+        this.#error( msg );
     }
 
-    #error( mensaje ){
+    #error( msg ){
         let self = this;
         this.#failed = true;
 
         try {
-            throw new Error( mensaje );
+            throw new Error( msg );
         } catch( e ) {
-            let report = this.#ts.report;
+            let report = this.#report;
             report.add_error( self.#class_name + ":" + self.#metodo );
             report.add_error( e.stack + "\n" );
         }
     }
     
+    /* I want to change this in a way that could allow us to see the difference between two objects.
+     */
     assertEquals( expected, actual, msg = "equals" ){
         this.#assert();
         
@@ -132,7 +143,7 @@ class Test {
         try {
             throw new Error( msg );
         } catch( e ) {
-            let report = this.#ts.report;
+            let report = this.#report;
             report.add_error( msg +": assert that" );
             report.add_error( actual  );
             report.add_error( "is" );
@@ -142,14 +153,15 @@ class Test {
         }
     }
 
-    #failed = false;
+    
     start(  ){
         let timer = new myclock();
         this.set_timer( timer );
         
-        this.#failed = false;
         this.#timer.start();
     }
+    
+    #failed = false;
     
 
     #metodo = "";
@@ -166,7 +178,6 @@ class Test {
     #metodos_number_of_asserts = 0;
     
     #really_done = false; // "done" is defined as function
-    #anyAssert = false;
 
     #timer = null;
     
@@ -185,7 +196,11 @@ class Test {
         this.#ts = ts;
     }
     
-
+    #report = null;
+    set_report( rep ){
+        this.#report = rep;
+    }
+    
     // atm those params are only useful for error messages
 //    static create( class_name, metodo ){
     static create( metodo ){
