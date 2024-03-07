@@ -4,6 +4,9 @@
 
 
 class fakeReport {
+    print_dot(){
+        
+    }
     risky(){
         
     }

@@ -1,11 +1,4 @@
 /* 
- * 2024 02 26 rmb
- * 
- * intento de refactor. 
- * objetivos:
- * 
- * cambiar Test a TestCases
- * sacar TestRunner y hacer un merge con TestCases
  * 
  * 
  */
@@ -19,17 +12,6 @@ import { Test, TestBad  } from "./Test.js";
 
 class TestSuite {
 
-    setup(){
-        var report = new console_report();
-        report.header();
-
-        this.report = report;
-    }
-
-    show_times(){
-        this.#mostrar_tiempos = true; 
-    }
-    #mostrar_tiempos = false; 
 
     // dump slow tests
     dump_test_time( txt, tiempo ){
@@ -52,36 +34,26 @@ class TestSuite {
      y luego:
      this.addTest( console_report_Test  );
      */
-    tests_fn = {};
+    #tests_constructor = {};
     addTest( test_modulo ){
-        let self = this;
+
         this.is_function( test_modulo );
 
         let name = test_modulo.name;
 
-//        self.debug( "addTest class_name ", name );
-
-        this.tests_fn[ name ] = function ( class_name, method ){
-//            self.debug( "fn class_name ", name );
-            return test_modulo.create( class_name, method );
+        /*
+         * if you run the myjsunit test suite (the one inside the package)
+         * you will notice some strange module names like ("module" or "module2"). 
+         * those are emulated from tests
+         */
+        this.#tests_constructor[ name ] = function ( method ){
+            return test_modulo.create( method );
         };
     }
-
+    
+    // esto tiene que volar a report
     #print_dot( test ){
-        let report = this.report;
-        if( test.failed ) {
-            report.failed();
-            return;
-        }
-
-        report.ok();
-        if( test.any_assert() ) {
-            report.dot();
-            return;
-        }
-        report.add_error( test.class_name + ":" + test.metodo + "() : OK but no assertions were made!\n" );
-        report.risky();
-        return;
+        this.report.print_dot( test );
     }
 
     /*
@@ -90,7 +62,8 @@ class TestSuite {
      * if there's no output after test run, it means a test is not executing done()
      */
     check_done( test ){
-        this.#print_dot( test );
+//        this.#print_dot( test );
+        this.report.print_dot( test );
 
         if( this.#running ) { // this.run() is not over yet
             return false;
@@ -118,14 +91,6 @@ class TestSuite {
         return control;
     }
 
-    #runners = {};
-
-    #running = false;
-
-    debug( ...txt ){
-//        console.log( ...txt );
-    }
-
     run( ){
         let self = this;
 
@@ -136,54 +101,57 @@ class TestSuite {
 
         let one_fail = false;
 
-        let tests = Object.keys( this.tests_fn );
-        self.debug( "tests ", this.tests_fn );
+        let tests = Object.keys( this.#tests_constructor );
+//        self.debug( "tests ", this.tests_fn );
 
 
-        tests.forEach( function ( constructor_fn ){
-
-            // stop at first fail ?
-            if( one_fail ) {
+        tests.forEach( function ( name_constructor ){
+//            console.log( constructor_fn, typeof constructor_fn  )
+            if( one_fail ) { // stop at first fail ?
                 return;
             }
-            let test_fn = self.tests_fn[ constructor_fn ];
-            let test = test_fn(); // nueva instanacia del TestCase
+            
+            
+            let test_constructor = self.#tests_constructor[ name_constructor ];
+            let test = test_constructor(); // nueva instanacia del TestCase
             let class_name = test.constructor.name;
 
-            self.debug( "class_name ", class_name );
+//            self.debug( "class_name ", class_name );
 
 
 
             let metodos = test.getTestMethods( );
 
-            self.debug( "metodos ", metodos );
+//            self.debug( "metodos ", metodos );
 
             metodos.forEach( function ( metodo ){
-                self.debug( "run metodo ", metodo );
+                report.total(); // inc cant tests
 
+//                let runner = test_constructor( name_constructor, metodo ); // nueva instanacia del TestCase
+                let runner = test_constructor( metodo ); // nueva instanacia del TestCase
                 
-
-                let runner = test_fn( constructor_fn, metodo ); // nueva instanacia del TestCase
+                runner.set_suite( self );
                 
-                let timer = new myclock();
-                runner.set_timer( timer );
-                report.add_timer( constructor_fn, metodo, timer );
+                runner.start( metodo );
+                
+                let timer  = runner.get_timer();
+                
+                report.add_timer( name_constructor, metodo, timer );
 
                 self.#runners[class_name + "." + metodo] = runner;
-                runner.set_suite( self );
+                
 
-                report.total();
+                
 
-                runner.start( metodo );
+                
 
                 try {
                     runner[metodo]();
                 } catch( e ) {
                     one_fail = true;
 
-                    report.add_error( constructor_fn + ":" + metodo );
+                    report.add_error( name_constructor + ":" + metodo );
                     report.add_error( e );
-//                    console.log( e );
                     runner.done_fail();
                 }
 
@@ -207,6 +175,23 @@ class TestSuite {
 
     }
     
+    
+    #runners = {};
+
+    #running = false;
+
+    debug( ...txt ){
+//        console.log( ...txt );
+    }
+
+    
+    
+    show_times(){
+        this.#mostrar_tiempos = true; 
+    }
+    #mostrar_tiempos = false; 
+
+    
     #tests = [ ];
     report = null;
     
@@ -216,6 +201,13 @@ class TestSuite {
     
     get_report( ){
         return this.report;
+    }
+    
+    setup(){
+        var report = new console_report();
+        report.header();
+
+        this.set_report( report );
     }
 
 

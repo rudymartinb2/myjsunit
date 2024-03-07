@@ -3,7 +3,7 @@
  * 
  */
 
-
+import { myclock } from "./myclock.js";
 
 
 class Test {
@@ -29,24 +29,22 @@ class Test {
 
 
     done( ){
-        let metodo = this.#metodo;
-//        console.log( "metodo", metodo )
-  
         if( this.#really_done ) {
             throw new Error( "done() was called twice on the same test?" );
         }
+        
         this.#really_done = true;
+
+        let metodo = this.#metodo;
 
         this.#timer.stop();
 
 // esto esta mal.
-        let report = this.#ts.get_report();
+//        let report = this.#ts.get_report();
         
-        let clase = this.constructor.name; // ???
+        let clase = this.#class_name; // ???
         let txt = clase + ":" + metodo + "() " ;
         this.#ts.dump_test_time( txt, this.#timer.diff() );
-//        this.#ts.dump_test_time( this.constructor.name, metodo, this.#timer.diff() );
-
         this.#ts.check_done( this );
     }
     
@@ -146,6 +144,9 @@ class Test {
 
     #failed = false;
     start(  ){
+        let timer = new myclock();
+        this.set_timer( timer );
+        
         this.#failed = false;
         this.#timer.start();
     }
@@ -153,6 +154,13 @@ class Test {
 
     #metodo = "";
     #class_name = "";
+    
+    get_class_name(){
+        return this.#class_name;
+    }
+    get_method(){
+        return this.#metodo;
+    }
     
         
     #metodos_number_of_asserts = 0;
@@ -165,20 +173,26 @@ class Test {
     set_timer( t ){
         this.#timer = t ;
     }
+    get_timer(){
+        return this.#timer ;
+    }
 
+    /*
+     * here I have a problem. Do Test need to access TS members just to access report ?
+     */
     #ts = null;
-    
     set_suite( ts ){
         this.#ts = ts;
     }
     
 
     // atm those params are only useful for error messages
-    static create( class_name, metodo ){
+//    static create( class_name, metodo ){
+    static create( metodo ){
         let self = new this( );
-        self.class_name = class_name;
+
+        self.#class_name = self.constructor.name;
         self.#metodo = metodo;
-//        console.log( class_name, metodo, module )
         return self;
     }
     

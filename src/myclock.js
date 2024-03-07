@@ -1,17 +1,22 @@
+/*
+ */
 class myclock {
-    constructor(){
-    }
+    #start_time = 0;
+    #end_time = 0;
+    #diff_time = 0;
+
     start(){
-        this.startTime2 = performance.now();        
+        this.#start_time = performance.now();
     }
+
     stop(){
-        this.endTime2 = performance.now();        
-        this.timeDiff2 = this.endTime2 - this.startTime2; //in ms
+        this.#end_time = performance.now();
+        this.#diff_time = this.#end_time - this.#start_time; // values in milliseconds
     }
     diff(){
-        return this.timeDiff2.toFixed(2);
+        return this.#diff_time.toFixed( 2 );
     }
 }
 
 
-export {myclock} 
+export { myclock } 
