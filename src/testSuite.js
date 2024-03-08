@@ -34,10 +34,11 @@ class TestSuite {
         };
     }
 
-    /*
-     * verify if we are really done
+    /* runs when a test executes .done() 
      * 
-     * if there's no output after test run, it means a test is not executing done()
+     * verify if we are really done.
+     * if there's no output after test suite run, 
+     *  it means a test is not executing done()
      */
     check_done( test ){
         test.print_dot( test );
@@ -77,6 +78,7 @@ class TestSuite {
 
         methods.forEach( function ( method ){
             let report = self.#report;
+            
 
             if( one_fail ) {
                 return;
@@ -84,7 +86,7 @@ class TestSuite {
             let counters = report.get_counters();
             counters.inc_tests();
 
-            // another new instance of testcase
+            // we need another new instance of testcase just for this method
             let test_constructor = self.#tests_constructors[ name_constructor ];
             let runner = test_constructor( method );
 
@@ -130,7 +132,7 @@ class TestSuite {
             // create() TestCase just to get the list of test methods
             let testCase = test_constructor();
 
-            let methods = testCase.getTestMethods( );
+            let methods = testCase.getTestMethods( testCase );
 
             one_fail = self.forEachTestMethod( methods, name_constructor );
 
@@ -144,10 +146,10 @@ class TestSuite {
          * 
          * update: prolly not needed anymore
          */
-//        if( this.is_all_done( ) ) {
-//            this.#report.end();
-//            return;
-//        }
+        if( this.is_all_done( ) ) {
+            this.#report.end();
+            return;
+        }
 
     }
 

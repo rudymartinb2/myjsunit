@@ -7,10 +7,12 @@
 import { Test, TestBad } from "../../src/Test.js";
 import { TestSuite } from "../../src/testSuite.js";
 import { counters } from "../../src/counters.js";
+import { console_report } from "../../src/console_report.js";
 
 import { fakeSuite } from "../doubles/fakeSuite.js";
 import { fakeTimer } from "../doubles/fakeTimer.js";
 import { fakeReport } from "../doubles/fakeReport.js";
+import { fakeOutput } from "../doubles/fakeOutput.js";
 
 
 
@@ -113,6 +115,29 @@ class assert_Test extends Test {
         t.assertFail( );
 
         this.assertEquals( esperado, actual );
+        this.done();
+    }
+
+    test_risky(){
+
+        let suite = new fakeSuite();
+        
+        let t = Test.create( "sarasa", "sarasa");
+        t.set_timer( new fakeTimer() );
+        t.set_suite( suite )
+//        let report = new fakeReport();
+        let report = new console_report( new fakeOutput() );
+        let c = new counters();
+        c.inc_risky();
+        report.set_counters( c );
+        t.set_report( report );
+        
+        
+        
+        this.assertTrue( c.is_risky() );
+        t.print_dot()
+        report.end();
+        
         this.done();
     }
 

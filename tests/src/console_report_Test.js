@@ -7,6 +7,8 @@ import { console_report } from "../../src/console_report.js";
 import { TestSuite, Test, TestBad } from "../../src/testSuite.js";
 
 import { fakeProcess } from "../doubles/fakeProcess.js";
+import { fakeOutput } from "../doubles/fakeOutput.js";
+
 
 class console_report_Test extends Test {
 
@@ -16,7 +18,7 @@ class console_report_Test extends Test {
         let cr = new console_report();
         
         let p = new fakeProcess();
-        let co = new console_output();
+        let co = new fakeOutput();
         co.set_process( p );
         cr.set_output( co );
         

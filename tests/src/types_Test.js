@@ -3,14 +3,10 @@
 
 
 
-import { Test, TestBad } from "../../src/Test.js";
-//import { TestSuite } from "../../src/testSuite.js";
-//import { counters } from "../../src/counters.js";
+import { Test } from "../../src/testSuite.js";
+
 import { types } from "../../src/types.js";
-//
-//import { fakeSuite } from "../doubles/fakeSuite.js";
-//import { fakeTimer } from "../doubles/fakeTimer.js";
-//import { fakeReport } from "../doubles/fakeReport.js";
+
 
 class types_Test extends Test {
         
