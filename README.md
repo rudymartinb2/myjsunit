@@ -12,26 +12,13 @@ myjsunit is a minimalistic testing framework for Node.js, inspired in PHPUnit.
 
 ## Installation
 
-Until the package is stable, I won't publish it to npm. At the moment just clone the repo and add a reference to your package.json, something like this
 
-```
-{
-    "type": "module",
-    "scripts": {
-        "test": "node node_modules/myjsunit/myrunner.js /home/rudy/37sur/oltsm2/testsjs/myTestSuite.js"
-    },
-    "dependencies": {
-        "myjsunit": "file:../myjsunit",
-        (...)
-    }
-}
-```
-
-if something goes wrong install the package from filesystem using npm, ie:
+clone the repo and install the package in yoor proyect from filesystem using npm, like this:
 
 ```
 $ npm i ../myjsunit.git
 ```
+
 
 ## Usage
 
@@ -44,6 +31,8 @@ Example usage:
 ```
 node node_modules/myjsunit/myrunner.js path/to/your/testSuite.js
 ```
+
+also take a look at runtests.sh script. If you install inotifywait and use a terminal you can run your tests while saving your files.
 
 ## Writing Test Suite
 
