@@ -9,22 +9,25 @@ import { myclock } from "./myclock.js";
 
 
 class Test {
-    // TODO: move to another class 
+    // TODO: move to another class or utility package
     getTestMethods( objParam ){
         let properties = new Set();
         let currentObj = objParam;
 
         while( currentObj ) {
-            
-            if( currentObj.constructor.name === "Test" || currentObj.constructor.name === "Object" ) { // I do not want to evaluate Test and Object
+            // TODO: review -- just continue ?
+            if( currentObj.constructor.name === "Test" || currentObj.constructor.name === "Object" ) { 
                 break;
             }
-//            console.log( currentObj.constructor.name )
-            Object.getOwnPropertyNames( currentObj ).forEach( function ( item ){
+            // 
+            let fn = function ( item ){
                 if( typeof objParam[item] === 'function' && item.substring( 0, 4 ) === "test" ){
                     properties.add( item );    
                 }
-            } );
+            };
+//            console.log( currentObj.constructor.name )
+
+            Object.getOwnPropertyNames( currentObj ).forEach( fn );
             currentObj = Object.getPrototypeOf( currentObj );
         }
         
@@ -42,8 +45,6 @@ class Test {
 
         this.#timer.stop();
 
-        /* 
-         */
         this.#ts.check_done( this );
     }
 

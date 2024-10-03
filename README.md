@@ -1,6 +1,6 @@
 # myjsunit
 
-myjsunit is a minimalistic testing framework for Node.js, inspired by PHPUnit. 
+myjsunit is a minimalistic testing framework for Node.js, inspired in PHPUnit. 
 
 ## Features
 
@@ -27,7 +27,11 @@ Until the package is stable, I won't publish it to npm. At the moment just clone
 }
 ```
 
-if something goes wrong install the package from filesystem using npm.
+if something goes wrong install the package from filesystem using npm, ie:
+
+```
+$ npm i ../myjsunit.git
+```
 
 ## Usage
 

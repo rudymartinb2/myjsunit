@@ -50,6 +50,7 @@ class myconsole_output extends console_output {
         this.line_break();
         this.normal( "Licence: MIT - https://en.wikipedia.org/wiki/MIT_License" );
         this.line_break();
+        this.line_break();
     }
 
     
