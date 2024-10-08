@@ -16,13 +16,13 @@ class Test {
 
         while( currentObj ) {
             // TODO: review -- just continue ?
-            if( currentObj.constructor.name === "Test" || currentObj.constructor.name === "Object" ) { 
+            if( currentObj.constructor.name === "Test" || currentObj.constructor.name === "Object" ) {
                 break;
             }
             // 
             let fn = function ( item ){
-                if( typeof objParam[item] === 'function' && item.substring( 0, 4 ) === "test" ){
-                    properties.add( item );    
+                if( typeof objParam[item] === 'function' && item.substring( 0, 4 ) === "test" ) {
+                    properties.add( item );
                 }
             };
 //            console.log( currentObj.constructor.name )
@@ -30,7 +30,7 @@ class Test {
             Object.getOwnPropertyNames( currentObj ).forEach( fn );
             currentObj = Object.getPrototypeOf( currentObj );
         }
-        
+
         return properties;
 
 
@@ -155,7 +155,15 @@ class Test {
             report.add_error( actual );
             report.add_error( "is" );
             report.add_error( expected );
-            report.add_error( self.#class_name + ":" + self.#metodo + " " + e.stack + "\n" );
+            // report.add_error( self.#class_name + ":" + self.#metodo + " " + e.stack + "\n" );
+
+            let filteredStack = e.stack
+                .split( "\n" )
+                .filter( line => !line.includes( 'myjsunit' ) )
+                .join( "\n" );
+
+            report.add_error( self.#class_name + ":" + self.#metodo + " " + filteredStack + "\n" );
+
 
         }
     }

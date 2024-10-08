@@ -13,7 +13,7 @@ myjsunit is a minimalistic testing framework for Node.js, inspired in PHPUnit.
 ## Installation
 
 
-clone the repo and install the package in yoor proyect from filesystem using npm, like this:
+clone the repo and install the package in your project from filesystem using npm, ie like this:
 
 ```
 $ npm i ../myjsunit.git
@@ -22,7 +22,7 @@ $ npm i ../myjsunit.git
 
 ## Usage
 
-1. Create your test suite file, which includes your test cases.
+1. Create your test suite file, which includes your test cases. 
 
 2. Use the myjsunit test runner to execute your test suite.
 
@@ -36,19 +36,12 @@ also take a look at runtests.sh script. If you install inotifywait and use a ter
 
 ## Writing Test Suite
 
-example from tests/myTestSuite.js:
+example :
 ```javascript
-import { TestSuite } from "../src/testSuite.js" ;
-
+import { TestSuite } from "myjsunit" ;
 
 import { promise_Test } from "./promise/promise_Test.js" ;
 
-import { assert_Test } from "./src/assert_Test.js" ;
-import { testSuite_Test } from "./src/testSuite_Test.js" ;
-
-import { comparar_claves_Test } from "./src/comparar_claves_Test.js" ;
-import { console_output_Test } from "./src/console_output_Test.js" ;
-import { console_report_Test } from "./src/console_report_Test.js" ;
 
 
 class myTestSuite extends TestSuite {
@@ -56,13 +49,6 @@ class myTestSuite extends TestSuite {
     start(){
         
         this.addTest( promise_Test  );
-        
-        this.addTest( testSuite_Test  );
-        
-        this.addTest( assert_Test  );
-        
-        this.addTest( console_output_Test  );
-        this.addTest( console_report_Test  );
         
         this.run();
     }
@@ -93,6 +79,15 @@ class MyTestCase extends Test {
         this.assertTrue(true, 'Example test case should pass');
         this.done();
     }
+
+    test_example_callback() {
+        let self = this;
+        let fn = function(){
+            self.assertTrue(true, 'Example test case should pass');
+            self.done();
+        };
+        do_async_op( fn );
+    }
 }
 
 export { MyTestCase };
@@ -100,6 +95,7 @@ export { MyTestCase };
 
 ## TO-DO
 
+Runner should check the class is a subclass from testSuite.
 There is a lot of clean up to be done.
 
 ## Contributing
@@ -108,5 +104,5 @@ Contributions are welcome! If you find any bugs or have suggestions for improvem
 
 ## License
 
-myjsunit is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+myjsunit is licensed under the MIT License. 
 
