@@ -1,6 +1,6 @@
 # myjsunit
 
-myjsunit is a minimalistic testing framework for Node.js, inspired on PHPUnit. 
+myjsunit is a minimalistic testing framework for Node.js, inspired on PHPUnit API. 
 
 ## Features
 
@@ -11,7 +11,6 @@ myjsunit is a minimalistic testing framework for Node.js, inspired on PHPUnit.
 - Easily extensible for custom test case implementations.
 
 ## Installation
-
 
 clone the repo and install the package in your project from filesystem using npm, ie like this:
 
@@ -32,7 +31,7 @@ Example usage:
 node node_modules/myjsunit/myrunner.js path/to/your/testSuite.js
 ```
 
-also take a look at runtests.sh script. If you install inotifywait and use a terminal you can run your tests while saving your files.
+You can run the tests from npm but that adds an extra delay.
 
 ## Writing Test Suite
 
@@ -93,9 +92,39 @@ class MyTestCase extends Test {
 export { MyTestCase };
 ```
 
+## API
+
+```javascript
+    assertEquals( expected, actual, msg = "equals" );
+    assertTrue( condition, msg = "" );
+    assertFalse( condition, msg = "" );
+    assertFail( msg = "assertFail() reached" );
+    done(); 
+```
+
+## Testing myjsunit
+
+assuming you already have nodejs installed, if you simply want to run the tests, from the root of the project run:
+
+```
+tests/run.sh
+```
+
+as alternative, if you have inotifywait installed and are using xterm or another similar console, from the root of the project, run:
+
+```
+tests/autoruntests.sh
+```
+
+this will fire the tests while you save your edits to the project files -- credits to Kent Beck for showing us such a neat trick.
+
+
 ## TO-DO
 
-Runner should check the class is a subclass from testSuite.
+There are some words in spannish mixed in the code.
+Rename myrunner.js as main.js
+Need a way to test earlier versions of NodeJS.
+Runner should check the testsuit class is a subclass from testSuite.
 There is a lot of clean up to be done.
 
 ## Contributing
