@@ -56,13 +56,13 @@ class myconsole_output extends console_output {
     
     select_color( counts ){
         // default case
-        this.set_ok_color( ); // green bh
+        this.set_ok_color( ); // green background
         
         if( counts.is_risky() ) { 
-            this.set_risky_color(); // brown bg
+            this.set_risky_color(); // brown background
         }
         if( counts.has_failed() ) { 
-            this.set_fail_color(); // red bg
+            this.set_fail_color(); // red background
         }
     }
     
@@ -99,12 +99,12 @@ class myconsole_output extends console_output {
     
     list_errors(){
         let self = this;
-        this.#error_list.forEach( function ( mensaje ){
-            if( mensaje instanceof Error ) {
-                self.normal( mensaje.stack );
-            } else {
-                self.normal( mensaje );
+        this.#error_list.forEach( function ( msg ){
+            let what = msg;
+            if( msg instanceof Error ) {
+                what = msg.stack ;
             }
+            self.normal( what );
             self.line_break();
 
         } );
@@ -133,10 +133,6 @@ class console_report {
         this.#output.normal( "." );
     }
 
-
-
-    // once we run out of tests to execute,
-    // we print the number of test ok/ran
     end(){
         this.#main_timer.stop();
 
@@ -150,9 +146,9 @@ class console_report {
 
         if( ! counters.is_ok() ) {
             // show errors before printing totals
-            this.list_errors();
+            this.#output.list_errors();
             // TODO: convert "process" to attribute
-            process.exitCode = 1; // a bash script could need this
+            process.exitCode = 1; 
         }
 
         this.print_total_asserts();
@@ -167,26 +163,15 @@ class console_report {
 
     print_time_spent(){
         let ret = this.#my_timers.calculate_time_spent();
-        let diff = this.#main_timer.diff() 
+        let diff = this.#main_timer.diff();
         this.#output.print_time_spent( ret, diff );
     }
     
 
 
-    list_errors(){
-        this.#output.list_errors();
-//        let self = this;
-//        this.#error_list.forEach( function ( mensaje ){
-//            if( mensaje instanceof Error ) {
-//                self.#output.normal( mensaje.stack );
-//            } else {
-//                self.#output.normal( mensaje );
-//            }
-//            self.#output.line_break();
-//
-//        } );
-
-    }    
+//    list_errors(){
+//        this.#output.list_errors();
+//    }    
     
     
     #my_timers;

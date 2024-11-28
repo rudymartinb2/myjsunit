@@ -1,11 +1,15 @@
-
-/* global process */
+/*
+ * main entry point.
+ * 
+ * to-do: rename it as main.js and add a symlink to it.
+ */
+/* global process, import */
 
 import { console_output } from "./src/console_output.js";
 import { console_report } from "./src/console_report.js";
 import { TestSuite, Test } from "./src/testSuite.js";
 import fs from 'fs';
-import path from 'path'; // Import the path module
+import path from 'path';
 
 function getClassNames( obj ){
     let arr = Object.getOwnPropertyNames( obj );
@@ -14,8 +18,8 @@ function getClassNames( obj ){
 
 let report = new console_report( new console_output() );
 
-let testSuiteFilePath = process.argv[2]; // Get the full path to the test suite file
-let {dir: testSuiteDir, name: testSuiteName} = path.parse( testSuiteFilePath ); // Parse the file path
+let testSuiteFilePath = process.argv[2]; 
+let {dir: testSuiteDir, name: testSuiteName} = path.parse( testSuiteFilePath );
 
 //console.log("Directory:", testSuiteDir);
 //console.log("Filename:", testSuiteName);

@@ -6,34 +6,13 @@
  */
 
 import { myclock } from "./myclock.js";
+import { getTestMethods } from "./getTestMethods.js";
 
 
 class Test {
-    // TODO: move to another class or utility package
+    // TODO: remove 
     getTestMethods( objParam ){
-        let properties = new Set();
-        let currentObj = objParam;
-
-        while( currentObj ) {
-            // TODO: review -- just continue ?
-            if( currentObj.constructor.name === "Test" || currentObj.constructor.name === "Object" ) {
-                break;
-            }
-            // 
-            let fn = function ( item ){
-                if( typeof objParam[item] === 'function' && item.substring( 0, 4 ) === "test" ) {
-                    properties.add( item );
-                }
-            };
-//            console.log( currentObj.constructor.name )
-
-            Object.getOwnPropertyNames( currentObj ).forEach( fn );
-            currentObj = Object.getPrototypeOf( currentObj );
-        }
-
-        return properties;
-
-
+        return getTestMethods( objParam );
     }
 
     done( ){
@@ -45,7 +24,8 @@ class Test {
 
         this.#timer.stop();
 
-        this.#ts.check_done( this );
+        this.print_dot( );
+        this.#ts.check_done( this ); // is this a Visitor Pattern ?
     }
 
     has_failed(){
@@ -67,21 +47,23 @@ class Test {
 
     #assert(){
         if( this.#really_done ) {
-            throw new Error( "Assert found after test done()" )
+            // could happen if a callback using done() is called twice
+            throw new Error( "Assert found after test done()" );
         }
 
         // this is just for this particular test. 
+        // we want to make sure we ran a single assert
         this.#metodos_number_of_asserts++;
 
+        // and this is for the global report
+        // TODO: add a inc_asserts() at the report object to simplify this
         let counters = this.#report.get_counters();
-
         counters.inc_asserts();
     }
 
     print_dot(  ){
-        let test = this;
         let report = this.#report;
-        if( test.#failed ) {
+        if( this.#failed ) {
             report.failed();
             return;
         }
@@ -89,11 +71,11 @@ class Test {
         let counters = report.get_counters();
         counters.inc_ok();
 
-        if( test.any_assert() ) {
+        if( this.any_assert() ) {
             report.dot();
             return;
         }
-        report.add_error( test.get_class_name() + ":" + test.get_method() + "() : OK but no assertions were made!\n" );
+        report.add_error( this.get_class_name() + ":" + this.get_method() + "() : OK but no assertions were made!\n" );
         report.risky();
     }
 
@@ -103,14 +85,14 @@ class Test {
 
     assertTrue( condicion, msg = "" ){
         this.#assert();
-        if( condicion !== true ) {
+        if( condicion !== true )
             this.#error( msg + " assertTrue fails \n" );
-    }
     }
 
     assertFalse( condition, msg = "" ){
         this.assertTrue( !condition, msg );
     }
+
     assertFail( msg = "assertFail() reached" ){
         this.#assert();
         this.#error( msg );
@@ -140,10 +122,22 @@ class Test {
         if( str_expected === str_actual ) {
             return;
         }
-        this.#error_equals( msg, str_actual, str_expected );
+
+        this.#error_equals( expected, actual, msg );
     }
 
-    #error_equals( msg, actual, expected ){
+    serializeIfObject( value ){
+        if( typeof value === "object" && value !== null ) {
+            try {
+                return JSON.stringify( value, null, 4 );
+            } catch {
+                return "[Unserializable Object]";
+            }
+        }
+        return value;
+    }
+
+    #error_equals( expected_var, actual_var, msg ){
         let self = this;
         this.#failed = true;
 
@@ -151,20 +145,24 @@ class Test {
             throw new Error( msg );
         } catch( e ) {
             let report = this.#report;
+
+
+            let expected = this.serializeIfObject( expected_var );
+            let actual = this.serializeIfObject( actual_var );
             report.add_error( msg + ": assert that" );
             report.add_error( actual );
             report.add_error( "is" );
             report.add_error( expected );
-            // report.add_error( self.#class_name + ":" + self.#metodo + " " + e.stack + "\n" );
-
+            
+            // remove myjsunit from callstack  
             let filteredStack = e.stack
                 .split( "\n" )
-                .filter( line => !line.includes( 'myjsunit' ) )
+                .filter( function ( line ){
+                    return !line.includes( 'myjsunit' );
+                } )
                 .join( "\n" );
 
             report.add_error( self.#class_name + ":" + self.#metodo + " " + filteredStack + "\n" );
-
-
         }
     }
 
@@ -199,9 +197,9 @@ class Test {
     set_timer( t ){
         this.#timer = t;
     }
-    get_timer(){
-        return this.#timer;
-    }
+//    get_timer(){
+//        return this.#timer;
+//    }
 
     /*
      * here I have a problem. Do Test need to access TS members just to access report ?
@@ -217,7 +215,6 @@ class Test {
     }
 
     // atm those params are only useful for error messages
-//    static create( class_name, metodo ){
     static create( metodo ){
         let self = new this( );
 
@@ -228,7 +225,7 @@ class Test {
 
 }
 
-
+// base test class made to create the first test on a project 
 class TestBad extends Test {
     test_bad(){
         this.assertTrue( false );
@@ -236,8 +233,9 @@ class TestBad extends Test {
     }
 }
 
+// nothing new at the moment, just the classname
+class TestCase extends Test {
 
+}
 
-
-
-export { Test, TestBad }
+export { Test, TestBad, TestCase }

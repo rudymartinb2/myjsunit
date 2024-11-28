@@ -10,27 +10,22 @@ import { console_report } from "./console_report.js";
 import { types } from "./types.js";
 
 
-import { Test, TestBad  } from "./Test.js";
+import { Test, TestBad, TestCase  } from "./Test.js";
 
 
 class TestSuite {
 
-    /*
-     * idea: class testsConstructors
-     * - list= {}
-     * + addTest()
-     * + get( name )
-     * 
-     */
     #tests_constructors = {};
-    addTest( test_module ){
-        types.is_function( test_module, "addTest() must receive a function.-" );
+    
+    // capitalized just to avoid conflict with "constructor" 
+    // TODO: is addTest() the rigth name ? we are passing a whole "module" to it ...
+    addTest( Constructor ){
+        types.is_function( Constructor, "addTest() must receive a constructor function.-" );
 
-
-        let name = test_module.name;
+        let name = Constructor.name;
 
         this.#tests_constructors[ name ] = function ( method ){
-            return test_module.create( method );
+            return Constructor.create( method );
         };
     }
 
@@ -40,9 +35,7 @@ class TestSuite {
      * if there's no output after test suite run, 
      *  it means a test is not executing done()
      */
-    check_done( test ){
-        test.print_dot( test );
-
+    check_done(  ){
         if( this.#running ) { // this.run() is not over yet
             return false;
         }
@@ -56,26 +49,21 @@ class TestSuite {
 
     is_all_done(  ){
         let self = this;
-        let control = true;
-        let keys = Object.keys( this.#runners );
-        keys.forEach( function ( key ){
-            if( !control ) {  // no point in checking the rest if just one test is not done
-                return;
-            }
-
+        for( const key in self.#runners ) {
             let test = self.#runners[ key ];
             if( !test.is_all_done() ) {
-                control = false;
+                return false;
             }
-        } );
-        return control;
+        }
+        return true;
     }
 
     forEachTestMethod( methods, name_constructor ){
         let self = this;
 
         let one_fail = false;
-
+        
+        // TODO: replace forEach with for() and break 
         methods.forEach( function ( method ){
             let report = self.#report;
             
@@ -174,4 +162,4 @@ class TestSuite {
 }
 
 
-export { TestSuite, Test, TestBad }
+export { TestSuite, Test, TestBad, TestCase }

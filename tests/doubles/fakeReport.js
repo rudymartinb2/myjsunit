@@ -1,9 +1,11 @@
-/* 
+/*  
+ * TODO: implement an "Interface" class on report()
  */
 
-
-
 class fakeReport {
+    dot(){
+        
+    }
     print_dot(){
         
     }

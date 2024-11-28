@@ -47,6 +47,8 @@ class console_output {
         this.FgWhite = "\x1b[37m";
         this.BgGreen = "\x1b[42m";
         this.BgRed = "\x1b[41m";
+        this.BgDarkRed = "\x1b[48;5;52m"; // Fondo rojo oscuro del rango 256-colores
+
         this.FgRed = "\x1b[31m";
         this.BgBlack = "\x1b[40m";
         this.BgYellow = "\x1b[43m";
@@ -55,6 +57,7 @@ class console_output {
         // combinations Fg/Bg
         this.risky_color = this.FgWhite + this.BgYellow;
         this.ok_color = this.FgBlack + this.BgGreen;
+//        this.fail_color = this.FgWhite + this.BgDarkRed;
         this.fail_color = this.FgWhite + this.BgRed;
 
         this.reset_color = "\x1b[0m";

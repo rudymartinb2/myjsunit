@@ -26,7 +26,25 @@ class console_report_Test extends Test {
 //        cr.has_failed();
         cr.failed();
         cr.risky();
-        cr.list_errors();
+//        cr.list_errors();
+
+        this.assertTrue( true );
+        this.done();
+    }
+    
+    test_comparar_vacio(){
+        let cr = new console_report();
+        
+        let p = new fakeProcess();
+        let co = new fakeOutput();
+        co.set_process( p );
+        cr.set_output( co );
+        
+        
+//        cr.has_failed();
+        cr.failed();
+        cr.risky();
+//        cr.list_errors();
 
         this.assertTrue( true );
         this.done();

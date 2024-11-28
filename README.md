@@ -1,6 +1,6 @@
 # myjsunit
 
-myjsunit is a minimalistic testing framework for Node.js, inspired on PHPUnit API. 
+myjsunit is a minimalistic testing framework for Node.js, inspired on PHPUnit API and code style. 
 
 ## Features
 
@@ -10,13 +10,28 @@ myjsunit is a minimalistic testing framework for Node.js, inspired on PHPUnit AP
 - Generates detailed test reports with pass/fail status, timings, and more.
 - Easily extensible for custom test case implementations.
 
+## Requires
+
+NodeJS version 18+ (need to test earlier versions)
+
+## Optional but recommended
+
+c8 if you want code coverage:  https://www.npmjs.com/package/c8
+inotifywait if you want to run your tests while saving your files. Look at your distribution packaga manager.
+Linux! Or another Unix variant. I *won't* test this project under anything else (read: Windows).
+
 ## Installation
 
-clone the repo and install the package in your project from filesystem using npm, ie like this:
+clone the repo 
+
+git clone https://github.com/rudymartinb/myjsunit.git
+
+then install the package in your project from filesystem using npm with relative or absolute path, ie like this:
 
 ```
 $ npm i ../myjsunit.git
 ```
+
 
 
 ## Usage
@@ -25,7 +40,7 @@ $ npm i ../myjsunit.git
 
 2. Use the myjsunit test runner to execute your test suite.
 
-Example usage:
+Example usage, from your project root:
 
 ```
 node node_modules/myjsunit/myrunner.js path/to/your/testSuite.js
@@ -36,22 +51,16 @@ You can run the tests from npm but that adds an extra delay.
 ## Writing Test Suite
 
 example :
+
 ```javascript
 import { TestSuite } from "myjsunit" ;
-
 import { promise_Test } from "./promise/promise_Test.js" ;
 
-
-
 class myTestSuite extends TestSuite {
-
     start(){
-        
         this.addTest( promise_Test  );
-        
         this.run();
     }
-    
 }
 
 export {  myTestSuite }
@@ -102,6 +111,23 @@ export { MyTestCase };
     done(); 
 ```
 
+at the moment, assertEquals is implemented like this:
+```
+    assertEquals( expected, actual, msg = "equals" ){
+        this.#assert();
+
+        let str_expected = JSON.stringify( expected );
+        let str_actual = JSON.stringify( actual );
+
+        if( str_expected === str_actual ) {
+            return;
+        }
+        this.#error_equals( msg, str_actual, str_expected );
+    }
+```
+
+which means it does not matter if both objects are exactly the same or totally different, it will compare the stringify versions of both.
+
 ## Testing myjsunit
 
 assuming you already have nodejs installed, if you simply want to run the tests, from the root of the project run:
@@ -119,12 +145,13 @@ tests/autoruntests.sh
 this will fire the tests while you save your edits to the project files -- credits to Kent Beck for showing us such a neat trick.
 
 
-## TO-DO
+## TO-DO and know bugs
 
-There are some words in spannish mixed in the code.
-Rename myrunner.js as main.js
+There are some words in spanish mixed in the code.
+Rename myrunner.js as main.js -- and perhaps adding a symlink myrunner.js -> main.js to avoid breaking things.
 Need a way to test earlier versions of NodeJS.
 Runner should check the testsuit class is a subclass from testSuite.
+Adjust inotifywait parameters to recognize valid js file extensions instead of running on everything under the project tree.
 There is a lot of clean up to be done.
 
 ## Contributing
