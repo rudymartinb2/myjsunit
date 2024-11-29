@@ -24,9 +24,11 @@ Linux! Or another Unix variant. I *won't* test this project under anything else 
 
 clone the repo 
 
+```
 git clone https://github.com/rudymartinb/myjsunit.git
+```
 
-then install the package in your project from filesystem using npm with relative or absolute path, ie like this:
+then install the package in your project from filesystem using npm with relative or absolute path, like this:
 
 ```
 $ npm i ../myjsunit.git
@@ -111,23 +113,6 @@ export { MyTestCase };
     done(); 
 ```
 
-at the moment, assertEquals is implemented like this:
-```
-    assertEquals( expected, actual, msg = "equals" ){
-        this.#assert();
-
-        let str_expected = JSON.stringify( expected );
-        let str_actual = JSON.stringify( actual );
-
-        if( str_expected === str_actual ) {
-            return;
-        }
-        this.#error_equals( msg, str_actual, str_expected );
-    }
-```
-
-which means it does not matter if both objects are exactly the same or totally different, it will compare the stringify versions of both.
-
 ## Testing myjsunit
 
 assuming you already have nodejs installed, if you simply want to run the tests, from the root of the project run:
@@ -136,7 +121,7 @@ assuming you already have nodejs installed, if you simply want to run the tests,
 tests/run.sh
 ```
 
-as alternative, if you have inotifywait installed and are using xterm or another similar console, from the root of the project, run:
+as alternative, if you have c8, inotifywait installed and are using xterm or another similar console, from the root of the project, run:
 
 ```
 tests/autoruntests.sh
@@ -147,12 +132,12 @@ this will fire the tests while you save your edits to the project files -- credi
 
 ## TO-DO and know bugs
 
-There are some words in spanish mixed in the code.
-Rename myrunner.js as main.js -- and perhaps adding a symlink myrunner.js -> main.js to avoid breaking things.
-Need a way to test earlier versions of NodeJS.
-Runner should check the testsuit class is a subclass from testSuite.
-Adjust inotifywait parameters to recognize valid js file extensions instead of running on everything under the project tree.
-There is a lot of clean up to be done.
+- There are some words in spanish mixed in the code.
+- Rename myrunner.js as main.js.
+- Need a way to test earlier versions of NodeJS.
+- Runner should check the testsuit class is a subclass from testSuite.
+- Adjust inotifywait parameters to recognize valid js file extensions instead of running on everything under the project tree.
+- There is a lot of clean up to be done.
 
 ## Contributing
 
