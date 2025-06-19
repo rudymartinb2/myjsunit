@@ -25,7 +25,7 @@ NodeJS version 18+
 clone the repo 
 
 ```
-git clone https://github.com/rudymartinb/myjsunit.git
+git clone https://github.com/rudymartinb2/myjsunit.git
 ```
 
 then install the package in your project from filesystem using npm with relative or absolute path, like this:
