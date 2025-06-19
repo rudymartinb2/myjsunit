@@ -111,6 +111,17 @@ class Test {
         }
     }
 
+    serializeIfObject( value ){
+        if( typeof value === "object" && value !== null ) {
+            try {
+                return JSON.stringify( value, null, 4 );
+            } catch {
+                return "[Unserializable Object]";
+            }
+        }
+        return value;
+    }
+
     /* I want to change this in a way that could allow us to see the difference between two objects.
      */
     assertEquals( expected, actual, msg = "equals" ){
@@ -126,44 +137,38 @@ class Test {
         this.#error_equals( expected, actual, msg );
     }
 
-    serializeIfObject( value ){
-        if( typeof value === "object" && value !== null ) {
-            try {
-                return JSON.stringify( value, null, 4 );
-            } catch {
-                return "[Unserializable Object]";
-            }
-        }
-        return value;
-    }
-
     #error_equals( expected_var, actual_var, msg ){
         let self = this;
         this.#failed = true;
+        let report = this.#report;
+        let stack = this.#getStack( msg );
 
+        let expected = this.serializeIfObject( expected_var );
+        let actual = this.serializeIfObject( actual_var );
+        report.add_error( msg + ": assert that" );
+//        report.add_error( " ("+typeof actual +") "+ actual );
+        report.add_error( actual );
+        report.add_error( "is" );
+//        report.add_error( " ("+typeof expected +") "+ expected );
+        report.add_error( expected );
+        report.add_error( self.#class_name + ":" + self.#metodo + " " + stack + "\n" );
+    }
+    
+    
+    #getStack( msg ){
+        let stack;
         try {
             throw new Error( msg );
         } catch( e ) {
-            let report = this.#report;
-
-
-            let expected = this.serializeIfObject( expected_var );
-            let actual = this.serializeIfObject( actual_var );
-            report.add_error( msg + ": assert that" );
-            report.add_error( actual );
-            report.add_error( "is" );
-            report.add_error( expected );
-            
             // remove myjsunit from callstack  
-            let filteredStack = e.stack
+            stack = e.stack
                 .split( "\n" )
                 .filter( function ( line ){
                     return !line.includes( 'myjsunit' );
                 } )
                 .join( "\n" );
-
-            report.add_error( self.#class_name + ":" + self.#metodo + " " + filteredStack + "\n" );
         }
+        return stack;
     }
 
     start(  ){

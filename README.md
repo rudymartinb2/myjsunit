@@ -17,7 +17,7 @@ NodeJS version 18+
 ## Optional but recommended
 
 * c8 if you want code coverage:  https://www.npmjs.com/package/c8
-* inotifywait if you want to run your tests while saving your files. Look at your distribution packaga manager.
+* inotifywait if you want to run your tests while saving your files. Look at your distribution package manager.
 * Linux! Or another Unix variant. I *won't* test this project under anything else (read: Windows).
 
 ## Installation
