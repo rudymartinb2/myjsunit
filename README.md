@@ -91,10 +91,11 @@ node node_modules/myjsunit/myrunner.js ./testsjs/testSuite.js
 
 ![running](/img/screenshot.png)
 
-It is recommended to take a look at the scripts inside node_modules/myjsunit/tests
+It is recommended to take a look at the scripts inside node_modules/myjsunit/test mentioned in the next section.
 
 Also you can run the tests from npm but that adds an extra delay.
 
+Exmaple of code coverage details from a web browser:
 
 ![code coverage exmaple](/img/coverage_report.png)
 
@@ -129,9 +130,7 @@ this will fire the tests while you save your edits to the project files -- credi
 
 - There are some words in spanish mixed in the code.
 - Rename myrunner.js as main.js.
-- Runner should check the testsuit class is a subclass from testSuite.
-- autoruntests.sh: Adjust inotifywait parameters to recognize valid js file extensions instead of running on everything under the project tree.
-- There is a lot of clean up to be done.
+
 
 ## Contributing
 

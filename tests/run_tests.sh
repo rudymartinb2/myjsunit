@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# assumes "node" 
 COVERAGE_DIR=var/coverage
 
 mkdir -p $COVERAGE_DIR
