@@ -42,11 +42,11 @@ example :
 
 ```javascript
 import { TestSuite } from "myjsunit" ;
-import { promise_Test } from "./promise/promise_Test.js" ;
+import { MyTestCase_Test } from "./promise/MyTestCase_Test.js" ;
 
 class myTestSuite extends TestSuite {
     start(){
-        this.addTest( promise_Test  );
+        this.addTest( MyTestCase_Test ); // only constructor is needed.
         this.run();
     }
 }
@@ -55,10 +55,12 @@ export {  myTestSuite }
 ```
 
 
-2. Import the `Test` class from `myjsunit` to create test cases.
-Extend the `Test` class and implement your test methods using descriptive names. All methods must start with the word "test" (lowercase) in order to be run.
-Use the provided assertion methods such as `assertTrue`, `assertFalse`, `assertEquals`, etc., to validate your test conditions.
-Use this.done() to indicate when no more assertions are left to be done for this particular test method. This is important in the case of promises when evaluating inside a callback.
+2. create individual files for each Unit Test Cases:
+* Import the `Test` class from `myjsunit` to create test cases.
+* Extend the `Test` class and implement your test methods using descriptive names. 
+* All methods must start with the word "test" (lowercase) in order to be run.
+* Use the provided assertion methods such as `assertTrue`, `assertFalse`, `assertEquals`, etc., to validate your test conditions.
+* Use this.done() to indicate when no more assertions are left to be done for this particular test method. This is important in the case of promises when evaluating inside a callback.
 
 Example:
 
