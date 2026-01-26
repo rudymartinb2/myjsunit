@@ -1,20 +1,24 @@
 #!/bin/bash
-# this script needs "c8" for code coverage and inotifywait
+# script to test myjsunit code
+# can be used as example for other projects
 
 clear
 
-INOTIFY_PATH=$(which inotifywait)
+# required commands
+command -v inotifywait >/dev/null || exit 1
+command -v node >/dev/null || exit 1
+command -v c8 >/dev/null || exit 1
 
-if [ ! -x "$INOTIFY_PATH" ]; then
-    echo "inotifywait is not installed."
-    exit 1
-fi
+# we assume "time" does exist.
 
+mkdir -p var
 
-inotifywait -m --format %w%f  --exclude "(\.\*|_docs/|.git|nbproject|var/coverage/)" -q -r -e close_write ./  | \
-while read CUAL ; do
+./tests/run_tests.sh
+
+inotifywait -m --format %w%f --exclude "(\.\*|_docs/|.git|nbproject|var/coverage/)" -q -r -e close_write ./ |
+while read FILE 
+do
     clear
-    time NODE_V8_COVERAGE=/tmp/cca c8  -o var/coverage  -x tests/ -r html node ./myrunner.js  ./tests/myTestSuite.js
-        
-done 
-
+    echo "trigger: $FILE"
+    ./tests/run_tests.sh
+done

@@ -21,9 +21,6 @@ let report = new console_report( new console_output() );
 let testSuiteFilePath = process.argv[2]; 
 let {dir: testSuiteDir, name: testSuiteName} = path.parse( testSuiteFilePath );
 
-//console.log("Directory:", testSuiteDir);
-//console.log("Filename:", testSuiteName);
-
 if( !fs.existsSync( testSuiteFilePath ) ) {
     console.log( "File does not exist: " + testSuiteFilePath );
     process.exit( 1 );

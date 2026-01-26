@@ -4,7 +4,6 @@ myjsunit is a minimalistic testing framework for Node.js, inspired on PHPUnit AP
 
 ## Features
 
-- Lightweight and easy to use.
 - Supports writing test cases using ES6 classes and syntax.
 - Provides assertion methods for common testing scenarios.
 - Generates detailed test reports with pass/fail status, timings, and more.
@@ -13,6 +12,7 @@ myjsunit is a minimalistic testing framework for Node.js, inspired on PHPUnit AP
 ## Requires
 
 NodeJS version 18+
+Recommended project type module
 
 ## Optional but recommended
 
@@ -22,16 +22,10 @@ NodeJS version 18+
 
 ## Installation
 
-clone the repo 
+from your project's root, do:
 
 ```
-git clone https://github.com/rudymartinb2/myjsunit.git
-```
-
-then install the package in your project from filesystem using npm with relative or absolute path, like this:
-
-```
-$ npm i ../myjsunit.git
+$ npm i https://github.com/rudymartinb2/myjsunit.git
 ```
 
 
@@ -40,17 +34,6 @@ $ npm i ../myjsunit.git
 
 1. Create your test suite file, which includes your test cases. 
 
-2. Use the myjsunit test runner to execute your test suite.
-
-Example usage, from your project root:
-
-```
-node node_modules/myjsunit/myrunner.js path/to/your/testSuite.js
-```
-
-You can run the tests from npm but that adds an extra delay.
-
-## Writing Test Suite
 
 example :
 
@@ -69,23 +52,18 @@ export {  myTestSuite }
 ```
 
 
-## Writing Test Cases
+2. Import the `Test` class from `myjsunit` to create test cases.
+Extend the `Test` class and implement your test methods using descriptive names. All methods must start with the word "test" (lowercase) in order to be run.
+Use the provided assertion methods such as `assertTrue`, `assertFalse`, `assertEquals`, etc., to validate your test conditions.
+Use this.done() to indicate when no more assertions are left to be done for this particular test method. This is important in the case of promises when evaluating inside a callback.
 
-1. Import the `Test` class from `myjsunit` to create test cases.
-
-2. Extend the `Test` class and implement your test methods using descriptive names. All methods must start with the word "test" (lowercase) in order to be run.
-
-3. Use the provided assertion methods such as `assertTrue`, `assertFalse`, `assertEquals`, etc., to validate your test conditions.
-
-4. Use this.done() to indicate when no more assertions are left to be done for this particular test method. This is important in the case of promises when evaluating inside a callback.
-
-Example test case:
+Example:
 
 ```javascript
 import { Test } from 'myjsunit';
 
 class MyTestCase extends Test {
-    test_example() {
+    test_example_true() {
         this.assertTrue(true, 'Example test case should pass');
         this.done();
     }
@@ -96,12 +74,29 @@ class MyTestCase extends Test {
             self.assertTrue(true, 'Example test case should pass');
             self.done();
         };
-        do_async_op( fn );
+        setTimeout(fn, 0);
     }
 }
-
+ 
 export { MyTestCase };
 ```
+
+3. Use the myjsunit test runner to execute your test suite.
+
+Minimal example usage, from your project root:
+
+```
+node node_modules/myjsunit/myrunner.js ./testsjs/testSuite.js
+```
+
+![running](/img/screenshot.png)
+
+It is recommended to take a look at the scripts inside node_modules/myjsunit/tests
+
+Also you can run the tests from npm but that adds an extra delay.
+
+
+![code coverage exmaple](/img/screenshot.png)
 
 ## API
 
@@ -113,12 +108,12 @@ export { MyTestCase };
     done(); 
 ```
 
-## Testing myjsunit
+## Testing myjsunit code
 
-assuming you already have nodejs installed, if you simply want to run the tests, from the root of the project run:
+if you simply want to run the tests, from the root of the project run:
 
 ```
-tests/run.sh
+tests/run_tests.sh
 ```
 
 as alternative, if you have c8, inotifywait installed and are using xterm or another similar console, from the root of the project, run:
@@ -134,9 +129,8 @@ this will fire the tests while you save your edits to the project files -- credi
 
 - There are some words in spanish mixed in the code.
 - Rename myrunner.js as main.js.
-- Need a way to test earlier versions of NodeJS.
 - Runner should check the testsuit class is a subclass from testSuite.
-- Adjust inotifywait parameters to recognize valid js file extensions instead of running on everything under the project tree.
+- autoruntests.sh: Adjust inotifywait parameters to recognize valid js file extensions instead of running on everything under the project tree.
 - There is a lot of clean up to be done.
 
 ## Contributing
