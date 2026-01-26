@@ -1,6 +1,9 @@
 # myjsunit
 
-myjsunit is a minimalistic testing framework for Node.js, inspired on PHPUnit API and code style. 
+myjsunit is a minimalistic testing framework for Node.js, inspired on PHPUnit API and code style. It is intended to be run from virtual console like xterm or konsole.
+
+![running](/img/screenshot.png)
+
 
 ## Features
 
@@ -89,7 +92,6 @@ Minimal example usage, from your project root:
 node node_modules/myjsunit/myrunner.js ./testsjs/testSuite.js
 ```
 
-![running](/img/screenshot.png)
 
 It is recommended to take a look at the scripts inside node_modules/myjsunit/test mentioned in the next section.
 
