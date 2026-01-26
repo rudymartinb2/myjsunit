@@ -96,7 +96,7 @@ It is recommended to take a look at the scripts inside node_modules/myjsunit/tes
 Also you can run the tests from npm but that adds an extra delay.
 
 
-![code coverage exmaple](/img/code_coverage.png)
+![code coverage exmaple](/img/coverage_report.png)
 
 ## API
 
