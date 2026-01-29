@@ -6,7 +6,7 @@ myjsunit is a minimalistic testing framework for Node.js, inspired on PHPUnit AP
 
 ## TLDR:
 
-clone a working example of my proposed scripts from here: https://github.com/rudymartinb2/myjsunit_sample
+if you want to see it in action, just clone a working example of my proposed scripts from here: https://github.com/rudymartinb2/myjsunit_sample
 
 
 ## Features
