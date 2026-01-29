@@ -58,7 +58,7 @@ class sampleTestSuite extends TestSuite {
     }
 }
 
-export {  myTestsampleTestSuiteSuite }
+export {  sampleTestSuite }
 ```
 
 
@@ -102,8 +102,6 @@ node node_modules/myjsunit/myrunner.js ./testsjs/sampleTestSuite.js
 ```
 
 
-It is recommended to take a look at the scripts inside node_modules/myjsunit/test mentioned in the next section.
-
 Also you can run the tests from npm but that adds an extra delay.
 
 Exmaple of code coverage details from a web browser:
@@ -139,8 +137,8 @@ this will fire the tests while you save your edits to the project files -- credi
 
 ## TO-DO and know bugs
 
-- There are some words in spanish mixed in the code.
-- Rename myrunner.js as main.js.
+- There are some spanish words in the code.
+- Rename myrunner.js as main.js ?
 - My English may be good, but is not *that* good. If are a native English speaker and you think something is wrong please let me know. 
 
 
