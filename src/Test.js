@@ -11,11 +11,11 @@ import { getTestMethods } from "./getTestMethods.js";
 
 class Test {
     // TODO: remove 
-    getTestMethods( objParam ){
+    getTestMethods( objParam ) {
         return getTestMethods( objParam );
     }
 
-    done( ){
+    done( ) {
         if( this.#really_done ) {
             throw new Error( "done() was called twice on the same test?" );
         }
@@ -25,27 +25,27 @@ class Test {
         this.#timer.stop();
 
         this.print_dot( );
-        this.#ts.check_done( this ); // is this a Visitor Pattern ?
+        this.#testsuite.check_done( this ); // is this a Visitor Pattern ?
     }
 
-    has_failed(){
+    has_failed() {
         return this.#failed;
     }
 
-    done_fail( ){
+    done_fail( ) {
         this.#failed = true;
         this.done();
     }
 
-    any_assert(){
+    any_assert() {
         return this.#metodos_number_of_asserts > 0;
     }
 
-    is_all_done(){
+    is_all_done() {
         return this.#really_done;
     }
 
-    #assert(){
+    #assert() {
         if( this.#really_done ) {
             // could happen if a callback using done() is called twice
             throw new Error( "Assert found after test done()" );
@@ -61,7 +61,7 @@ class Test {
         counters.inc_asserts();
     }
 
-    print_dot(  ){
+    print_dot(  ) {
         let report = this.#report;
         if( this.#failed ) {
             report.failed();
@@ -79,39 +79,40 @@ class Test {
         report.risky();
     }
 
-    getNumAsserts(){
+    getNumAsserts() {
         return this.#metodos_number_of_asserts;
     }
 
-    assertTrue( condicion, msg = "" ){
+    assertTrue( condicion, msg ) {
+        if( msg === undefined ) { 
+            msg = ""; // netbeans code formatter does not like parameters with default values...
+        }
         this.#assert();
-        if( condicion !== true )
-            this.#error( msg + " assertTrue fails \n" );
+        if( condicion !== true ) {
+            msg = msg + " assertTrue fails \n";
+            this.#error( msg );
+        }
     }
 
-    assertFalse( condition, msg = "" ){
+    assertFalse( condition, msg = "" ) {
         this.assertTrue( !condition, msg );
     }
 
-    assertFail( msg = "assertFail() reached" ){
+    assertFail( msg = "assertFail() reached" ) {
         this.#assert();
         this.#error( msg );
     }
 
-    #error( msg ){
-        let self = this;
+    #error( msg ) {
         this.#failed = true;
 
-        try {
-            throw new Error( msg );
-        } catch( e ) {
-            let report = this.#report;
-            report.add_error( self.#class_name + ":" + self.#metodo );
-            report.add_error( e.stack + "\n" );
-        }
+        const e = new Error( msg );
+        let report = this.#report;
+        report.add_error( this.#class_name + ":" + this.#metodo );
+        report.add_error( e.stack + "\n" );
     }
 
-    serializeIfObject( value ){
+    serializeIfObject( value ) {
         if( typeof value === "object" && value !== null ) {
             try {
                 return JSON.stringify( value, null, 4 );
@@ -124,7 +125,7 @@ class Test {
 
     /* I want to change this in a way that could allow us to see the difference between two objects.
      */
-    assertEquals( expected, actual, msg = "equals" ){
+    assertEquals( expected, actual, msg = "equals" ) {
         this.#assert();
 
         let str_expected = JSON.stringify( expected );
@@ -137,7 +138,7 @@ class Test {
         this.#error_equals( expected, actual, msg );
     }
 
-    #error_equals( expected_var, actual_var, msg ){
+    #error_equals( expected_var, actual_var, msg ) {
         let self = this;
         this.#failed = true;
         let report = this.#report;
@@ -146,32 +147,26 @@ class Test {
         let expected = this.serializeIfObject( expected_var );
         let actual = this.serializeIfObject( actual_var );
         report.add_error( msg + ": assert that" );
-//        report.add_error( " ("+typeof actual +") "+ actual );
         report.add_error( actual );
         report.add_error( "is" );
-//        report.add_error( " ("+typeof expected +") "+ expected );
         report.add_error( expected );
         report.add_error( self.#class_name + ":" + self.#metodo + " " + stack + "\n" );
     }
-    
-    
-    #getStack( msg ){
+
+    #getStack( msg ) {
         let stack;
-        try {
-            throw new Error( msg );
-        } catch( e ) {
-            // remove myjsunit from callstack  
-            stack = e.stack
-                .split( "\n" )
-                .filter( function ( line ){
+
+        const e = new Error( msg );
+        stack = e.stack.split( "\n" )
+                .filter( function ( line ) {
                     return !line.includes( 'myjsunit' );
                 } )
                 .join( "\n" );
-        }
+
         return stack;
     }
 
-    start(  ){
+    start(  ) {
         let timer = new myclock();
         this.set_timer( timer );
 
@@ -186,10 +181,10 @@ class Test {
     #metodo = "";
     #class_name = "";
 
-    get_class_name(){
+    get_class_name() {
         return this.#class_name;
     }
-    get_method(){
+    get_method() {
         return this.#metodo;
     }
 
@@ -199,28 +194,25 @@ class Test {
 
     #timer = null;
 
-    set_timer( t ){
+    set_timer( t ) {
         this.#timer = t;
     }
-//    get_timer(){
-//        return this.#timer;
-//    }
 
     /*
      * here I have a problem. Do Test need to access TS members just to access report ?
      */
-    #ts = null;
-    set_suite( ts ){
-        this.#ts = ts;
+    #testsuite = null;
+    set_suite( ts ) {
+        this.#testsuite = ts;
     }
 
     #report = null;
-    set_report( rep ){
+    set_report( rep ) {
         this.#report = rep;
     }
 
     // atm those params are only useful for error messages
-    static create( metodo ){
+    static create( metodo ) {
         let self = new this( );
 
         self.#class_name = self.constructor.name;
@@ -232,13 +224,14 @@ class Test {
 
 // base test class made to create the first test on a project 
 class TestBad extends Test {
-    test_bad(){
+    test_bad() {
         this.assertTrue( false );
         this.done( false );
     }
 }
 
-// nothing new at the moment, just the classname
+// nothing new at the moment, just the classname.
+// goal was to rename Test as TestCase but ...
 class TestCase extends Test {
 
 }
